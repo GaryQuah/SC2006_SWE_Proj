@@ -1,0 +1,278 @@
+:root{
+    --clr-text: #000000;
+    --clr-Information: #519A09;
+    --clr-background: #E0F2CE;
+    --clr-background-accent: #E7EAEE;
+    --clr-background-dark-accent: #519A09;
+
+    --ff-sansserif: sans-serif;
+    --ff-logo: sans-serif;
+
+    --border-radius: 0.6em;
+    --top-margin: 0.7em;
+    --box-height: 2.5em;
+    --input-margin: 0.4em;
+    --max-width: 30rem;
+    --label-size: 1.2em;
+    --input-size: 1em;
+    --label-sizes: 0.9em;
+    --input-sizes: 0.8em;
+}
+
+html {
+    font-family: var(--ff-sansserif);
+    color: var(--clr-text);
+}
+
+body{
+    margin: 0;
+    height: 100vh;
+}
+
+.main-grid{
+    background-image: url(../images/main-background.gif);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 90vh;
+}
+
+a{
+    color: #000000;
+    text-decoration: none;
+    padding: 0.25em;
+}
+
+h2{
+    margin: 0;
+}
+
+p{
+    margin: 0;
+}
+
+/*Header section*/
+
+.header{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    border-bottom: 2px solid rgb(255, 255, 255);
+    box-shadow: 0px 3px 4px -4px #000000;
+    padding: 0;
+    align-items: center;
+}
+
+.logo{
+    justify-content: left;
+    align-items: center;
+    margin: 0.5em;
+}
+
+.logo img{
+    max-width: 1em;
+    max-height: 1em;
+}
+
+/*Main section*/
+
+main{
+    margin: 0.3em;
+    vertical-align: middle;
+}
+
+.heading{
+    text-align: center;
+    font-size: 2.8em;
+    margin-bottom: 0.3em;
+}
+
+form{
+    padding: 0.5em;
+    max-width: var(--max-width);
+    margin: auto;
+}
+
+.activity-input{
+    display: flex;
+    gap: var(--input-margin);
+    flex-direction: column;
+}
+
+.activity-input label{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.activity-input input{
+    border: 1px solid #999999;
+    border-radius: var(--border-radius);
+    height: var(--box-height);
+    font-size: var(--input-size);
+}
+
+.time-input{
+    margin-top: var(--top-margin);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.time-input p{
+    font-size: var(--label-size);
+}
+
+.time-head{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.time-input select{
+    height: var(--box-height);
+    border: 1px solid #999999;
+    border-radius: var(--border-radius);
+    font-size: var(--input-size);
+}
+
+.intensity-input{
+    margin-top: var(--top-margin);
+}
+
+.intensity-input label{
+    font-size: var(--label-size);
+}
+
+.intensity-head{
+    font-weight: bold;
+}
+
+.intensity-level{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--input-margin);
+    gap: 2em;
+}
+
+.location-input{
+    margin-top: var(--top-margin);
+}
+
+.location-input label{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.location-select{
+    width: 100%;
+    border: 1px solid #999999;
+    border-radius: var(--border-radius); 
+    height: var(--box-height);
+    margin-top: var(--input-margin);
+    font-size: var(--input-size);
+}
+
+.plan-activity{
+    margin-top: 1.5em;
+    background-color: #000000;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    height: 3em;
+    border-radius: 0.8em;
+}
+
+.btn-healthbuddy{
+    margin: auto;
+    margin-top: 0.7em;
+    margin-bottom: 0.7em;
+    align-content: center;
+    background-color: var(--clr-background-dark-accent);
+    border-radius: var(--border-radius);
+    width: 10em;
+    height: 2em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3em;
+}
+
+.btn-healthbuddy img{
+    max-width: 30px;
+    max-height: 30px;
+    align-self: center;
+    margin: 0;
+}
+
+.btn-healthbuddy p{
+    color: white;
+    align-self: center;
+    margin: 0;
+}
+
+.nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 0;
+    margin: auto;
+    margin-top: 1em;
+}
+
+.nav img{
+    max-width: 5em;
+    max-height: 5em;
+}
+
+.nav li{
+    list-style: none;
+}
+
+@media (width <= 450px) {
+    .heading{
+        font-size: 2em;
+    }
+
+    .activity-input label{
+        font-size: var(--label-sizes);
+        font-weight: bold;
+    }
+    
+    .activity-input input{
+        font-size: var(--input-sizes);
+    }
+    
+    .time-input p{
+        font-size: var(--label-sizes);
+    }
+    
+    .time-head{
+        font-size: var(--label-sizes);
+    }
+    
+    .time-input select{
+        height: var(--box-height);
+        font-size: var(--input-sizes);
+    }
+
+    .intensity-input label{
+        font-size: var(--label-sizes);
+    }
+    
+    .intensity-head{
+        font-weight: bold;
+    }
+    
+    .location-input label{
+        font-size: var(--label-sizes);
+    }
+    
+    .location-select{
+        font-size: var(--input-sizes);
+    }
+}
