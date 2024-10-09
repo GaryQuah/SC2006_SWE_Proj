@@ -1,0 +1,288 @@
+:root{
+    --clr-text: #000000;
+    --clr-Information: #519A09;
+    --clr-background: #E0F2CE;
+    --clr-background-accent: #E7EAEE;
+    --clr-background-dark-accent: #519A09;
+
+    --ff-sansserif: sans-serif;
+    --ff-logo: sans-serif;
+
+    --border-radius: 0.6em;
+    --top-margin: 0.7em;
+    --box-height: 2.5em;
+    --input-margin: 0.4em;
+    --max-width: 30rem;
+    --label-size: 1.2em;
+    --input-size: 1em;
+    --label-sizes: 1.2em;
+    --input-sizes: 0.8em;
+}
+
+html {
+    font-family: var(--ff-sansserif);
+    color: var(--clr-text);
+}
+
+body{
+    margin: 0;
+    height: 100vh;
+}
+
+.main_grid{
+    background-image: url(../../assets/main-background.gif);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a{
+    color: #000000;
+    text-decoration: none;
+    padding: 0.25em;
+}
+
+h2{
+    margin: 0;
+}
+
+.header{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    box-shadow: 0px 3px 4px -4px #000000;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.menu_logo{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.menu_button{
+    border: none;
+    background: none;
+    margin-top: 1em;
+}
+
+.logo{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin-left: 0.5em;
+    align-items: center;
+    padding-top: 0.5em;
+    text-decoration: none;
+    color: #000000;
+}
+
+.logo img{
+    max-width: 1.5em;
+    max-height: 1.5em;
+}
+
+.logo h4{
+    font-size: 1.1em;
+}
+
+.profile{
+    margin-top: 1em;
+    margin-right: 0.3em;
+}
+
+/*Main section*/
+
+.main_main{
+    display: flex;
+    flex-direction: column;
+}
+
+.heading{
+    text-align: center;
+    font-size: 2.8em;
+    margin-bottom: 0.3em;
+}
+
+form{
+    padding: 0.5em;
+    max-width: var(--max-width);
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.activity_input{
+    display: flex;
+    gap: var(--input-margin);
+    flex-direction: column;
+}
+
+.activity_input label{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.activity_input input{
+    border: 1px solid #999999;
+    border-radius: var(--border-radius);
+    height: var(--box-height);
+    font-size: var(--input-size);
+}
+
+.time_input{
+    margin-top: var(--top-margin);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3em;
+}
+
+.time_input p{
+    font-size: var(--label-size);
+}
+
+.time_head{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.time_input select{
+    height: var(--box-height);
+    border: 1px solid #999999;
+    border-radius: var(--border-radius);
+    font-size: var(--input-size);
+}
+
+.intensity_input{
+    margin-top: var(--top-margin);
+}
+
+.intensity_input label{
+    font-size: var(--label-size);
+}
+
+.intensity_head{
+    font-weight: bold;
+}
+
+.intensity_level{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: var(--input-margin);
+    gap: 2em;
+}
+
+.location_input{
+    margin-top: var(--top-margin);
+}
+
+.location_input label{
+    font-size: var(--label-size);
+    font-weight: bold;
+}
+
+.location_select{
+    width: 100%;
+    border: 1px solid #999999;
+    border-radius: var(--border-radius); 
+    height: var(--box-height);
+    margin-top: var(--input-margin);
+    font-size: var(--input-size);
+}
+
+.plan_activity{
+    margin-top: 1.5em;
+    background-color: #000000;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+    height: 3em;
+    border-radius: 0.8em;
+}
+
+.btn_healthbuddy{
+    margin: auto;
+    margin-bottom: 0.7em;
+    align-content: center;
+    background-color: var(--clr-background-dark-accent);
+    border-radius: var(--border-radius);
+    width: 10em;
+    height: 3em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3em;
+}
+
+.btn_healthbuddy img{
+    max-width: 30px;
+    max-height: 30px;
+    align-self: center;
+    margin: 0;
+}
+
+.btn_healthbuddy p{
+    color: white;
+    align-self: center;
+    margin: 0;
+}
+
+@media (width <= 450px) {
+    .main_main{
+        margin-top: 0.5em;
+    }
+    
+    .heading{
+        font-size: 2em;
+    }
+
+    .activity_input label{
+        font-size: var(--label-sizes);
+        font-weight: bold;
+    }
+    
+    .activity_input input{
+        font-size: var(--input-sizes);
+    }
+    
+    .time_input p{
+        font-size: var(--label-sizes);
+    }
+    
+    .time_head{
+        font-size: var(--label-sizes);
+    }
+    
+    .time_input select{
+        height: var(--box-height);
+        font-size: var(--input-sizes);
+    }
+
+    .intensity_input label{
+        font-size: var(--label-sizes);
+    }
+    
+    .intensity_head{
+        font-weight: bold;
+    }
+    
+    .location_input label{
+        font-size: var(--label-sizes);
+    }
+    
+    .location_select{
+        font-size: var(--input-sizes);
+    }
+}
