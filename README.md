@@ -1,3 +1,6 @@
+# Added InfoWindow and Generate Loops
+<img width="741" alt="Screenshot 2024-10-18 at 11 51 36 PM" src="https://github.com/user-attachments/assets/1720164a-ddf4-4901-b962-2b7b52b26f7a">
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
