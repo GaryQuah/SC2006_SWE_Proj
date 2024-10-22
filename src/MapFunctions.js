@@ -29,6 +29,9 @@ export default function MapFunctions() {
   const [selectedPark, setSelectedPark] = useState(null);
   const mapRef = useRef(null);
 
+  const [communityCenters, setCommunityCenters] = useState([]); // New state for community centers
+  const [selectedCommunityCenter, setSelectedCommunityCenter] = useState(null); // New state for selected community center
+
   const [originPointName, setOriginPointName] = useState(false);
   const [endPointName, setEndPointName] = useState(false);
 
@@ -42,14 +45,14 @@ export default function MapFunctions() {
   const [originWeatherData, setOriginWeatherData] = useState(null);
   const [originUVData, setOriginUVData] = useState(null);
 
-  const [originLatitude, setOriginLatitude] = useState("");
-  const [originLongitude, setOriginLongitude] = useState("");
+  //const [originLatitude, setOriginLatitude] = useState("");
+  //const [originLongitude, setOriginLongitude] = useState("");
 
   const [endpointWeatherData, setEndWeatherData] = useState(null);
   const [endpointUVData, setEndUVData] = useState(null);
 
-  const [endpointLatitude, setEndLatitude] = useState("");
-  const [endpointLongitude, setEndLongitude] = useState("");
+  //const [endpointLatitude, setEndLatitude] = useState("");
+  //const [endpointLongitude, setEndLongitude] = useState("");
 
 
 
@@ -91,13 +94,16 @@ const fetchWeatherDataEnd = async () => {
 };
 }
 
-
   const handleLoad = (map) => {
     mapRef.current = map;
   };
 
   const handleMarkerClick = (park) => {
     setSelectedPark(park);
+  };
+
+  const handleCommunityCenterClick = (center) => {
+    setSelectedCommunityCenter(center); // Set selected community center when clicked
   };
 
   const generateRoute = () => {
@@ -232,6 +238,33 @@ const fetchWeatherDataEnd = async () => {
     }
   };
 
+  const fetchCommunityCenters = (location) => {
+    const service = new window.google.maps.places.PlacesService(mapRef.current);
+    service.nearbySearch(
+      {
+        location: location,
+        radius: 5000, // Search within 5 km
+        keyword: "community center", // Use keyword to find community centers
+        type: ["establishment"], // Broad type to include community centers
+      },
+      (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          setCommunityCenters(results); // Set the fetched community centers to state
+        } else {
+          console.error(`Error fetching community centers: ${status}`);
+        }
+      }
+    );
+  };
+
+  const handleFetchCommunityCenters = () => {
+    if (markerPosition) {
+      fetchCommunityCenters(markerPosition); // Fetch community centers near the current marker position
+    } else {
+      alert("Please generate a route first to get the origin location.");
+    }
+  };
+
   const getRandomWaypoint = (originLatLng, distance) => {
     const latOffset = (Math.random() - 0.5) * (distance / 69);
     const lngOffset = (Math.random() - 0.5) * (distance / (69 * Math.cos(originLatLng.lat() * Math.PI / 180)));
@@ -250,8 +283,11 @@ const fetchWeatherDataEnd = async () => {
       setWaypoint(null);                 // Clear waypoints
       setOriginMarkerPosition(center);   // Reset origin marker to default position
       setEndMarkerPosition(center);      // Reset endpoint marker to default position
+
       setParks([]);                      // Clear parks
       setSelectedPark(null);             // Clear selected park
+      setCommunityCenters([]);           // Clear community centers
+      setSelectedCommunityCenter(null);  // Clear selected community center
   
       // Optionally close InfoWindows
       setOpenOrigin(false);              // Close origin InfoWindow
@@ -262,7 +298,6 @@ const fetchWeatherDataEnd = async () => {
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={["places"]}>
       <div>
-        {/*<h3>Generate Route</h3>*/}
         <input
           type="text"
           value={postalCode}
@@ -278,6 +313,7 @@ const fetchWeatherDataEnd = async () => {
         <button onClick={generateRoute}>Generate Route</button>
         <button onClick={generateLoop}>Generate Loop</button>
         <button onClick={handleFetchParks}>Fetch Parks</button>
+        <button onClick={handleFetchCommunityCenters}>Fetch Community Centers</button> {/* New button */}
         <button onClick={resetMap}>Reset Map</button>
 
         <GoogleMap
@@ -295,62 +331,6 @@ const fetchWeatherDataEnd = async () => {
             />
           )}
 
-          {/* Origin Marker */}
-          <Marker
-            position={markerPosition}
-            title="Origin"
-            icon={{
-              url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
-              scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
-            }}
-            onClick={() => {
-              setOpenOrigin(true); // Open origin InfoWindow
-            }}
-          />
-
-          {/* Waypoint Marker */}
-          {waypoint && (
-            <Marker
-              position={waypoint}
-              title="Random Waypoint"
-              icon={{
-                url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
-                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
-              }}
-              onClick={() => {
-                setOpenWaypoint(true); // Open waypoint InfoWindow
-              }}
-            />
-          )}
-          
-          {/* InfoWindow for the origin marker */}
-          {openOrigin && (
-            <InfoWindow position={markerPosition} onCloseClick={() => setOpenOrigin(false)}>
-              <div>
-                <p>Origin: {originPointName}</p>
-                <p>Temperature: {originWeatherData.main.temp} °C</p>
-                <p>Weather: {originWeatherData.weather[0].description}</p>
-                <p>UV Index: {originUVData.value}</p>
-
-                {originImage && <img src={originImage} alt="Origin" style={{ width: "100px", height: "100px" }} />} {/* Display origin image */}
-              </div>
-            </InfoWindow>
-          )}
-
-          {/* InfoWindow for the waypoint marker */}
-          {openWaypoint && (
-            <InfoWindow position={waypoint} onCloseClick={() => setOpenWaypoint(false)}>
-              <div>
-                <p>EndPoint: {endPointName}</p>
-                <p>Temperature: {endpointWeatherData.main.temp} °C</p>
-                <p>Weather: {endpointWeatherData.weather[0].description}</p>
-                <p>UV Index: {endpointUVData.value}</p>
-                
-                {endImage && <img src={endImage} alt="Endpoint" style={{ width: "100px", height: "100px" }} />} {/* Display endpoint image */}
-              </div>
-            </InfoWindow>
-          )}
-
           {/* Markers for parks */}
           {parks.map((park) => (
             <Marker
@@ -364,6 +344,33 @@ const fetchWeatherDataEnd = async () => {
               onClick={() => handleMarkerClick(park)}
             />
           ))}
+
+          {/* Markers for community centers */}
+          {communityCenters.map((center) => (
+            <Marker
+              key={center.place_id}
+              position={center.geometry.location}
+              title={center.name}
+              icon={{
+                url: "https://icon-library.com/images/24591-200.png", // Custom icon for community centers
+                scaledSize: new window.google.maps.Size(30, 30),
+              }}
+              onClick={() => handleCommunityCenterClick(center)}
+            />
+          ))}
+
+          {/* InfoWindow for selected community center */}
+          {selectedCommunityCenter && (
+            <InfoWindow
+              position={selectedCommunityCenter.geometry.location}
+              onCloseClick={() => setSelectedCommunityCenter(null)}
+            >
+              <div>
+                <h4>{selectedCommunityCenter.name}</h4>
+                <p>{selectedCommunityCenter.vicinity}</p>
+              </div>
+            </InfoWindow>
+          )}
           
           {/* InfoWindow for selected park */}
           {selectedPark && (
