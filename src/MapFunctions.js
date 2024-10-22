@@ -243,12 +243,19 @@ const fetchWeatherDataEnd = async () => {
 
   const resetMap = () => {
     if (mapRef.current) {
-      mapRef.current.setCenter(center);
-      mapRef.current.setZoom(14);
-      setDirections(null);
-      setWaypoint(null);
-      //setOpen(false);
-      setParks([]); // Clear parks when resetting
+      mapRef.current.setCenter(center);  // Reset to default center
+      mapRef.current.setZoom(14);        // Reset zoom level
+  
+      setDirections(null);               // Clear directions
+      setWaypoint(null);                 // Clear waypoints
+      setOriginMarkerPosition(center);   // Reset origin marker to default position
+      setEndMarkerPosition(center);      // Reset endpoint marker to default position
+      setParks([]);                      // Clear parks
+      setSelectedPark(null);             // Clear selected park
+  
+      // Optionally close InfoWindows
+      setOpenOrigin(false);              // Close origin InfoWindow
+      setOpenWaypoint(false);            // Close waypoint InfoWindow
     }
   };
 
