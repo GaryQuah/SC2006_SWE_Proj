@@ -24,9 +24,11 @@ export default function MapFunctions() {
   const [parks, setParks] = useState([]); // State for park locations
   const [selectedPark, setSelectedPark] = useState(null); // State for selected park
 
+  // New states for address details
+  const [originAddress, setOriginAddress] = useState("");
+  const [destinationAddress, setDestinationAddress] = useState("");
 
   const mapRef = useRef(null);
-
 
   const handleLoad = (map) => {
     mapRef.current = map;
@@ -42,34 +44,38 @@ export default function MapFunctions() {
       return;
     }
 
-
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ address: postalCode }, (results, status) => {
       if (status === "OK" && results.length > 0) {
         const originLatLng = results[0].geometry.location;
-
-        // Set marker position to origin location
         setMarkerPosition(originLatLng);
         setOpen(true);
 
         // Calculate random waypoint based on distance
-        const randomWaypoint = getRandomWaypoint(originLatLng, distance * 0.621371);
+        const randomWaypoint = getRandomWaypoint(originLatLng, distance);
         setWaypoint(randomWaypoint);
-        const waypoints = [{ location: randomWaypoint, stopover: true }];
 
         // Request directions from DirectionsService
         const directionsService = new window.google.maps.DirectionsService();
         directionsService.route(
           {
             origin: originLatLng,
-            destination: originLatLng,
+            destination: randomWaypoint,
             travelMode: window.google.maps.TravelMode.WALKING,
-            waypoints: waypoints,
-            optimizeWaypoints: false,
           },
           (result, status) => {
             if (status === window.google.maps.DirectionsStatus.OK) {
               setDirections(result);
+              setOriginAddress(results[0].formatted_address); // Set origin address
+
+              // Geocode the waypoint to get destination address
+              geocoder.geocode({ location: randomWaypoint }, (destResults, destStatus) => {
+                if (destStatus === "OK" && destResults.length > 0) {
+                  setDestinationAddress(destResults[0].formatted_address); // Set destination address
+                } else {
+                  console.error(`Geocoding for destination failed: ${destStatus}`);
+                }
+              });
             } else {
               console.error(`Error fetching directions: ${status}`);
               alert(`Error fetching directions: ${status}`);
@@ -82,6 +88,8 @@ export default function MapFunctions() {
       }
     });
   };
+
+  
 
     // Generate a loop route
     const generateLoop = () => {
@@ -195,7 +203,7 @@ export default function MapFunctions() {
         />
         <button onClick={generateRoute}>Generate Route</button>
         <button onClick={generateLoop}>Generate Loop</button>
-        <button onClick={handleFetchParks}>Fetch Parks</button> {/* New button to fetch parks */}
+        <button onClick={handleFetchParks}>Fetch Parks</button>
         <button onClick={resetMap}>Reset Map</button>
 
         <GoogleMap
@@ -206,7 +214,12 @@ export default function MapFunctions() {
           onLoad={handleLoad}
           gestureHandling="greedy"
         >
-          {directions && <DirectionsRenderer directions={directions} />}
+          {directions && (
+            <DirectionsRenderer
+              directions={directions}
+              options={{ suppressMarkers: true }} // Suppress default markers
+            />
+          )}
 
           {/* Marker for the origin location */}
           <Marker
@@ -218,7 +231,7 @@ export default function MapFunctions() {
           {/* InfoWindow for the origin marker */}
           {open && (
             <InfoWindow position={markerPosition} onCloseClick={() => setOpen(false)}>
-              <p>Origin: {postalCode}</p>
+              <p>Origin: {originAddress}</p>
             </InfoWindow>
           )}
 
@@ -227,7 +240,15 @@ export default function MapFunctions() {
             <Marker
               position={waypoint}
               title="Random Waypoint"
+              onClick={() => setOpen(true)} // Optional: Open InfoWindow on click
             />
+          )}
+
+          {/* InfoWindow for the destination marker */}
+          {waypoint && (
+            <InfoWindow position={waypoint} onCloseClick={() => setWaypoint(null)}>
+              <p>Destination: {destinationAddress}</p>
+            </InfoWindow>
           )}
 
           {/* Markers for parks */}
@@ -243,8 +264,8 @@ export default function MapFunctions() {
               onClick={() => handleMarkerClick(park)} // Example onClick event
             />
           ))}
-            
-             {/* InfoWindow for selected park */}
+
+          {/* InfoWindow for selected park */}
           {selectedPark && (
             <InfoWindow
               position={selectedPark.geometry.location}
@@ -263,7 +284,6 @@ export default function MapFunctions() {
               </div>
             </InfoWindow>
           )}
-          
         </GoogleMap>
       </div>
     </LoadScript>
