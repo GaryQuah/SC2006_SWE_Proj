@@ -9,7 +9,7 @@ export default function WeatherFunctions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_KEY = "704bf997547d0f7ed616723a4499158b"; // Replace with your OpenWeatherMap API key
+  const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; // Replace with your OpenWeatherMap API key
 
   const fetchWeatherData = async () => {
     setLoading(true);
@@ -18,13 +18,13 @@ export default function WeatherFunctions() {
     try {
       // Fetch weather data
       const weatherResponse = await axios.get(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
       );
       setWeatherData(weatherResponse.data);
 
       // Fetch UV data
       const uvResponse = await axios.get(
-        `https://api.openweathermap.org/data/2.5/uvi?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`
+        `https://api.openweathermap.org/data/2.5/uvi?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
       );
       setUvData(uvResponse.data);
     } catch (err) {

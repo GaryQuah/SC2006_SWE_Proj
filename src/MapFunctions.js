@@ -6,6 +6,7 @@ import {
   DirectionsRenderer,
   InfoWindow,
 } from "@react-google-maps/api";
+import axios from "axios";
 
 const containerStyle = {
   width: "100%",
@@ -19,23 +20,84 @@ export default function MapFunctions() {
   const [postalCode, setPostalCode] = useState("");
   const [distance, setDistance] = useState("");
   const [waypoint, setWaypoint] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [markerPosition, setMarkerPosition] = useState(center);
-  const [parks, setParks] = useState([]); // State for park locations
-  const [selectedPark, setSelectedPark] = useState(null); // State for selected park
-
-  // New states for address details
-  const [originAddress, setOriginAddress] = useState("");
-  const [destinationAddress, setDestinationAddress] = useState("");
-
+  const [openOrigin, setOpenOrigin] = useState(false); // State for origin InfoWindow
+  const [openWaypoint, setOpenWaypoint] = useState(false); // State for waypoint InfoWindow
+  const [markerPosition, setOriginMarkerPosition] = useState(center);
+  const [endPointPosition, setEndMarkerPosition] = useState(center);
+  
+  const [parks, setParks] = useState([]);
+  const [selectedPark, setSelectedPark] = useState(null);
   const mapRef = useRef(null);
+
+  const [originPointName, setOriginPointName] = useState(false);
+  const [endPointName, setEndPointName] = useState(false);
+
+  const originPointIcon = "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg"; // Replace with your logo URL
+
+  const [originImage, setOriginImage] = useState(""); 
+  const [endImage, setEndImage] = useState(""); 
+  const endPointIcon = "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg"; // Replace with your logo URL
+
+  //Weather related
+  const [originWeatherData, setOriginWeatherData] = useState(null);
+  const [originUVData, setOriginUVData] = useState(null);
+
+  const [originLatitude, setOriginLatitude] = useState("");
+  const [originLongitude, setOriginLongitude] = useState("");
+
+  const [endpointWeatherData, setEndWeatherData] = useState(null);
+  const [endpointUVData, setEndUVData] = useState(null);
+
+  const [endpointLatitude, setEndLatitude] = useState("");
+  const [endpointLongitude, setEndLongitude] = useState("");
+
+
+
+  const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; // Replace with your OpenWeatherMap API key
+
+  const fetchWeatherDataOrigin = async () => {
+
+    try {
+      // Fetch weather data
+      const weatherResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${markerPosition.lat}&lon=${markerPosition.lng}&appid=${WEATHER_API_KEY}&units=metric`
+      );
+      setOriginWeatherData(weatherResponse.data);
+
+      // Fetch UV data
+      const uvResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/uvi?lat=${markerPosition.lat}&lon=${markerPosition.lng}&appid=${WEATHER_API_KEY}`
+      );
+      setOriginUVData(uvResponse.data);
+    } catch (err) {
+  };
+}
+
+const fetchWeatherDataEnd = async () => {
+
+  try {
+    // Fetch weather data
+    const weatherResponse = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${endPointPosition.lat}&lon=${endPointPosition.lng}&appid=${WEATHER_API_KEY}&units=metric`
+    );
+    setEndWeatherData(weatherResponse.data);
+
+    // Fetch UV data
+    const uvResponse = await axios.get(
+      `https://api.openweathermap.org/data/2.5/uvi?lat=${endPointPosition.lat}&lon=${endPointPosition.lng}&appid=${WEATHER_API_KEY}`
+    );
+    setEndUVData(uvResponse.data);
+  } catch (err) {
+};
+}
+
 
   const handleLoad = (map) => {
     mapRef.current = map;
   };
 
   const handleMarkerClick = (park) => {
-    setSelectedPark(park); // Set the clicked park as the selected park
+    setSelectedPark(park);
   };
 
   const generateRoute = () => {
@@ -43,53 +105,58 @@ export default function MapFunctions() {
       alert("Please enter both a postal code and a distance.");
       return;
     }
-
+  
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ address: postalCode }, (results, status) => {
       if (status === "OK" && results.length > 0) {
         const originLatLng = results[0].geometry.location;
-        setMarkerPosition(originLatLng);
-        setOpen(true);
-
+        setOriginPointName(results[0].formatted_address); // Store origin name
+        setOriginImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${originLatLng.lat()},${originLatLng.lng()}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`); // Street View image for origin
+  
+        setOriginMarkerPosition(originLatLng);
+        setOpenOrigin(false);
+        fetchWeatherDataOrigin();
+  
         // Calculate random waypoint based on distance
         const randomWaypoint = getRandomWaypoint(originLatLng, distance);
         setWaypoint(randomWaypoint);
 
-        // Request directions from DirectionsService
-        const directionsService = new window.google.maps.DirectionsService();
-        directionsService.route(
-          {
-            origin: originLatLng,
-            destination: randomWaypoint,
-            travelMode: window.google.maps.TravelMode.WALKING,
-          },
-          (result, status) => {
-            if (status === window.google.maps.DirectionsStatus.OK) {
-              setDirections(result);
-              setOriginAddress(results[0].formatted_address); // Set origin address
+        // Geocode the waypoint location
+        geocoder.geocode({ location: randomWaypoint }, (results, status) => {
+          if (status === "OK" && results.length > 0) {
+            setEndPointName(results[0].formatted_address); // Store endpoint name
+            setEndImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${randomWaypoint.lat},${randomWaypoint.lng}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`); // Street View image for endpoint
+            setEndMarkerPosition(randomWaypoint);
+            fetchWeatherDataEnd();
 
-              // Geocode the waypoint to get destination address
-              geocoder.geocode({ location: randomWaypoint }, (destResults, destStatus) => {
-                if (destStatus === "OK" && destResults.length > 0) {
-                  setDestinationAddress(destResults[0].formatted_address); // Set destination address
+            // Request directions from DirectionsService
+            const directionsService = new window.google.maps.DirectionsService();
+            directionsService.route(
+              {
+                origin: originLatLng,
+                destination: randomWaypoint, // Set destination to the waypoint
+                travelMode: window.google.maps.TravelMode.WALKING,
+              },
+              (result, status) => {
+                if (status === window.google.maps.DirectionsStatus.OK) {
+                  setDirections(result);
                 } else {
-                  console.error(`Geocoding for destination failed: ${destStatus}`);
+                  console.error(`Error fetching directions: ${status}`);
+                  alert(`Error fetching directions: ${status}`);
                 }
-              });
-            } else {
-              console.error(`Error fetching directions: ${status}`);
-              alert(`Error fetching directions: ${status}`);
-            }
+              }
+            );
+          } else {
+            console.error(`Geocoding waypoint failed: ${status}`);
+            alert(`Geocoding waypoint failed: ${status}`);
           }
-        );
+        });
       } else {
-        console.error(`Geocoding failed: ${status}`);
-        alert(`Geocoding failed: ${status}`);
+        console.error(`Geocoding origin failed: ${status}`);
+        alert(`Geocoding origin failed: ${status}`);
       }
     });
   };
-
-  
 
     // Generate a loop route
     const generateLoop = () => {
@@ -102,12 +169,12 @@ export default function MapFunctions() {
       geocoder.geocode({ address: postalCode }, (results, status) => {
         if (status === "OK" && results.length > 0) {
           const originLatLng = results[0].geometry.location;
-  
-          setMarkerPosition(originLatLng);
+
+          setOriginMarkerPosition(originLatLng);
   
           const numberOfWaypoints = 3; // Create multiple waypoints for the loop
           const loopWaypoints = Array.from({ length: numberOfWaypoints }, () =>
-            getRandomWaypoint(originLatLng, distance * 0.621371)
+            getRandomWaypoint(originLatLng, distance ) //* 0.621371
           );
           setWaypoint(loopWaypoints);
   
@@ -180,7 +247,7 @@ export default function MapFunctions() {
       mapRef.current.setZoom(14);
       setDirections(null);
       setWaypoint(null);
-      setOpen(false);
+      //setOpen(false);
       setParks([]); // Clear parks when resetting
     }
   };
@@ -188,7 +255,7 @@ export default function MapFunctions() {
   return (
     <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY} libraries={["places"]}>
       <div>
-        <h3>Generate Route</h3>
+        {/*<h3>Generate Route</h3>*/}
         <input
           type="text"
           value={postalCode}
@@ -215,39 +282,65 @@ export default function MapFunctions() {
           gestureHandling="greedy"
         >
           {directions && (
-            <DirectionsRenderer
-              directions={directions}
-              options={{ suppressMarkers: true }} // Suppress default markers
+            <DirectionsRenderer 
+              directions={directions} 
+              options={{ suppressMarkers: true }}
             />
           )}
 
-          {/* Marker for the origin location */}
+          {/* Origin Marker */}
           <Marker
             position={markerPosition}
             title="Origin"
-            onClick={() => setOpen(true)}
+            icon={{
+              url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+              scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+            }}
+            onClick={() => {
+              setOpenOrigin(true); // Open origin InfoWindow
+            }}
           />
 
-          {/* InfoWindow for the origin marker */}
-          {open && (
-            <InfoWindow position={markerPosition} onCloseClick={() => setOpen(false)}>
-              <p>Origin: {originAddress}</p>
-            </InfoWindow>
-          )}
-
-          {/* Marker for the random waypoint */}
+          {/* Waypoint Marker */}
           {waypoint && (
             <Marker
               position={waypoint}
               title="Random Waypoint"
-              onClick={() => setOpen(true)} // Optional: Open InfoWindow on click
+              icon={{
+                url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+              }}
+              onClick={() => {
+                setOpenWaypoint(true); // Open waypoint InfoWindow
+              }}
             />
           )}
+          
+          {/* InfoWindow for the origin marker */}
+          {openOrigin && (
+            <InfoWindow position={markerPosition} onCloseClick={() => setOpenOrigin(false)}>
+              <div>
+                <p>Origin: {originPointName}</p>
+                <p>Temperature: {originWeatherData.main.temp} °C</p>
+                <p>Weather: {originWeatherData.weather[0].description}</p>
+                <p>UV Index: {originUVData.value}</p>
 
-          {/* InfoWindow for the destination marker */}
-          {waypoint && (
-            <InfoWindow position={waypoint} onCloseClick={() => setWaypoint(null)}>
-              <p>Destination: {destinationAddress}</p>
+                {originImage && <img src={originImage} alt="Origin" style={{ width: "100px", height: "100px" }} />} {/* Display origin image */}
+              </div>
+            </InfoWindow>
+          )}
+
+          {/* InfoWindow for the waypoint marker */}
+          {openWaypoint && (
+            <InfoWindow position={waypoint} onCloseClick={() => setOpenWaypoint(false)}>
+              <div>
+                <p>EndPoint: {endPointName}</p>
+                <p>Temperature: {endpointWeatherData.main.temp} °C</p>
+                <p>Weather: {endpointWeatherData.weather[0].description}</p>
+                <p>UV Index: {endpointUVData.value}</p>
+                
+                {endImage && <img src={endImage} alt="Endpoint" style={{ width: "100px", height: "100px" }} />} {/* Display endpoint image */}
+              </div>
             </InfoWindow>
           )}
 
@@ -258,18 +351,18 @@ export default function MapFunctions() {
               position={park.geometry.location}
               title={park.name}
               icon={{
-                url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Custom icon URL
-                scaledSize: new window.google.maps.Size(30, 30), // Resize the icon
+                url: "https://icon-library.com/images/park-icon-png/park-icon-png-9.jpg",
+                scaledSize: new window.google.maps.Size(30, 30),
               }}
-              onClick={() => handleMarkerClick(park)} // Example onClick event
+              onClick={() => handleMarkerClick(park)}
             />
           ))}
-
+          
           {/* InfoWindow for selected park */}
           {selectedPark && (
             <InfoWindow
               position={selectedPark.geometry.location}
-              onCloseClick={() => setSelectedPark(null)} // Close InfoWindow on close click
+              onCloseClick={() => setSelectedPark(null)}
             >
               <div>
                 <h4>{selectedPark.name}</h4>
@@ -284,6 +377,7 @@ export default function MapFunctions() {
               </div>
             </InfoWindow>
           )}
+          
         </GoogleMap>
       </div>
     </LoadScript>
