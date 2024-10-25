@@ -8,10 +8,10 @@ import {
 } from "@react-google-maps/api";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
+
 import mapstyle from "./css/Map.module.css";
 import Hikingicon from "../assets/Hiking icon.png"
 import Usericon from "../assets/User icon.png"
-
 
 // Define interfaces for data structures
 interface WeatherData {
@@ -44,12 +44,61 @@ interface Place {
   }[];
 }
 
+interface ImportMeta {
+  env: {
+    VITE_GMAP_APIKEY: string;
+    // Add other environment variables here as needed
+  };
+}
+
 const containerStyle = {
   width: "100%",
   height: "86vh",
 };
 
 const center = { lat: 1.290270, lng: 103.851959 }; // Default center position
+
+const ActivitiesList = [
+  "Yoga",
+  "Pilates",
+  "Gym",
+  "Spinning",
+  "Bowling",
+  "Table Tennis",
+  "Squash",
+  "Bouldering",
+  "Dance",
+  "Gymnastics",
+  "Zumba",
+  "Indoor Cycling",
+  "Jump Rope",
+  "Kickboxing",
+  "Aerobics",
+  "Handball",
+  "Basketball",
+  "Badminton",
+  "Running",
+  "Cycling",
+  "Hiking",
+  "Volleyball",
+  "Kayaking",
+  "Skating",
+  "Dragon Boating",
+  "Outdoor Yoga",
+  "Soccer",
+  "Snowboarding",
+  "Tennis",
+  "Rollerblading",
+  "Wakeboarding",
+  "Fishing",
+  "Basketball",
+  "Archery",
+  "Windsurfing",
+  "Trail Running",
+  "Frisbee",
+  "Kite Flying",
+];
+
 
 export function MapFunctions() {  
   
