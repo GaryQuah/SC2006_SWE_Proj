@@ -124,7 +124,8 @@ export function MapFunctions() {
   const [_endpointWeatherData, setEndWeatherData] = useState<WeatherData | null>(null);
   const [_endpointUVData, setEndUVData] = useState<UvData | null>(null);
 
-  const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; // Replace with your OpenWeatherMap API key
+  const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
+  const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
   const fetchWeatherDataOrigin = async () => {
 
@@ -185,7 +186,7 @@ const fetchWeatherDataEnd = async () => {
       if (status === "OK" && results && results.length > 0) {
         const originLatLng = results[0].geometry.location.toJSON();
         setOriginPointName(results[0].formatted_address); // Store origin name
-        setOriginImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${originLatLng.lat},${originLatLng.lng}&key=${import.meta.env.VITE_GMAP_APIKEY}`); // Street View image for origin
+        setOriginImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${originLatLng.lat},${originLatLng.lng}&key=${GMAPS_API_KEY}`); // Street View image for origin
         setOriginMarkerPosition(originLatLng);
         setOpenOrigin(false);
         fetchWeatherDataOrigin();
@@ -198,7 +199,7 @@ const fetchWeatherDataEnd = async () => {
         geocoder.geocode({ location: randomWaypoint }, (results, status) => {
           if (status === "OK" && results && results.length > 0) {
             setEndPointName(results[0].formatted_address); // Store endpoint name
-            setEndImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${randomWaypoint.lat},${randomWaypoint.lng}&key=${import.meta.env.VITE_GMAP_APIKEY}`); // Street View image for endpoint
+            setEndImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${randomWaypoint.lat},${randomWaypoint.lng}&key=${GMAPS_API_KEY}`); // Street View image for endpoint
             setEndMarkerPosition(randomWaypoint);
             fetchWeatherDataEnd();
 
@@ -416,7 +417,7 @@ const fetchWeatherDataEnd = async () => {
                         <img src={Usericon}></img>
                     </NavLink>
                 </div>
-      <LoadScript googleMapsApiKey={import.meta.env.VITE_GMAP_APIKEY} libraries={["places"]}>
+      <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
         <div>
           <input
             type="text"
@@ -510,7 +511,6 @@ const fetchWeatherDataEnd = async () => {
                 </div>
               </InfoWindow>
             )}
-            
           </GoogleMap>
         </div>
       </LoadScript>
