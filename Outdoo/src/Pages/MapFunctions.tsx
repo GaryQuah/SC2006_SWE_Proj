@@ -142,6 +142,8 @@ export function MapFunctions() {
   //For activity locations
   const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
   const [activityLocations, setActivityLocations] = useState<Place[]>([]);
+  const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
+
 
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
@@ -182,6 +184,7 @@ export function MapFunctions() {
   };
 
   const handleActivityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setShowActivityMarkers(true);
     setSelectedActivity(e.target.value);
     if (mapRef.current) {
       fetchActivityLocations(e.target.value, center); // Fetch locations based on the selected activity
@@ -241,6 +244,8 @@ const fetchWeatherDataEnd = async () => {
       alert("Please enter both a postal code and a distance.");
       return;
     }
+
+    resetMap();
   
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode({ address: postalCode }, (results, status) => {
@@ -343,6 +348,7 @@ const fetchWeatherDataEnd = async () => {
     };
 
   const fetchParks = (location: LatLng) => {
+    resetMap();
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     service.nearbySearch(
       {
@@ -461,6 +467,8 @@ const fetchWeatherDataEnd = async () => {
       // Optionally close InfoWindows
       setOpenOrigin(false);              // Close origin InfoWindow
       setOpenWaypoint(false);            // Close waypoint InfoWindow
+      
+      setShowActivityMarkers(false);             // Close all the activity markers
     }
   };
 
@@ -658,7 +666,7 @@ const fetchWeatherDataEnd = async () => {
             )}
 
             {/* Markers for activity locations */}
-            {activityLocations.map((location) => (
+            {showActivityMarkers && activityLocations.map((location) => (
               <Marker
                 key={location.place_id}
                 position={location.geometry.location}
