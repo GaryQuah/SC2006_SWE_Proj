@@ -1,21 +1,59 @@
 import { NavLink } from "react-router-dom"
+import { useState } from "react"
 import { Footer } from "../Components/Footer"
 import Healthbuddyicon from "../assets/Chatbot white Icon.png"
 import addactivitystyle from "./css/AddActivities.module.css"
-import Menuicon from "../assets/Menu.png"
 import Hikingicon from "../assets/Hiking icon.png"
 import Usericon from "../assets/User icon.png"
+import { Healthbuddy } from "../Components/Healthbuddy"
 
 export function AddActivities(){
+    const [formData, setFormData] = useState({
+        activity: '',
+        timestart: '-1',
+        timeend: '-1',
+        intensity: '',
+        location: ''
+    });
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>{
+        const { name, value } = event.target;
+        setFormData((prevFormData) =>({
+            ...prevFormData,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = (event: React.FormEvent) =>{
+        event.preventDefault();
+
+        const postData = new FormData();
+        postData.append('activity', formData.activity);
+        postData.append('timestart', formData.timestart);
+        postData.append('timeend', formData.timeend);
+        postData.append('intensity', formData.intensity);
+        postData.append('location', formData.location);
+
+        fetch('http://127.0.0.1:8080/test',{
+            method: "POST",
+            body: postData,
+        })
+        .then((Response)=> Response.json())
+        .then((data)=>{
+            console.log(data)
+        })
+        .catch((err)=>{
+            console.log(err)
+        })
+    }
+    
+    
+    const [showhealthbuddy, setShowHealthbuddy] = useState(false);
+
     return (
         <>
             <div className={addactivitystyle.main_grid}>
                 <div className={addactivitystyle.header}>
                     <div className={addactivitystyle.menu_logo}>
-                        <button className={addactivitystyle.menu_button}>
-                            <img src={Menuicon} className={addactivitystyle.menu}></img>
-                        </button>
-                        
                         <div>
                             <NavLink to="/dashboard" className={addactivitystyle.logo}>
                                 <img src={Hikingicon}></img>
@@ -29,16 +67,16 @@ export function AddActivities(){
                 </div>
                 <main className={addactivitystyle.main_main}>
                     <h1 className={addactivitystyle.heading}>What would you like to do?</h1>
-                    <form action="#">
+                    <form onSubmit={handleSubmit}>
                         <div className={addactivitystyle.activity_input}>
                             <label htmlFor="activity">Activity Type:</label>
-                            <input placeholder=" e.g. Running" type="text" id="activity" name="activitytype"></input>
+                            <input placeholder=" e.g. Running" type="text" id="activity" name="activity" value={formData.activity} onChange={handleInputChange}></input>
                         </div>
 
                         <div className={addactivitystyle.time_input}>
                             <label className={addactivitystyle.time_head} htmlFor="timestart">Time:</label>
-                            <select className={addactivitystyle.timestart_select} name="timestart" id="timestart">
-                                <option value="-1">Select Time</option>
+                            <select className={addactivitystyle.timestart_select} name="timestart" id="timestart" value={formData.timestart} onChange={handleInputChange}>
+                                <option value="-1">Now</option>
                                 <option value="0">00:00AM</option>
                                 <option value="1">00:30AM</option>
                                 <option value="2">01:00AM</option>
@@ -89,8 +127,8 @@ export function AddActivities(){
                                 <option value="47">11:30PM</option>
                             </select>
                             <p>to</p>
-                            <select className={addactivitystyle.timeend_select} name="timeend" id="timeend">
-                                <option value="-1">Select Time</option>
+                            <select className={addactivitystyle.timeend_select} name="timeend" id="timeend" value={formData.timeend} onChange={handleInputChange}>
+                                <option value="-1">Optional</option>
                                 <option value="0">00:00AM</option>
                                 <option value="1">00:30AM</option>
                                 <option value="2">01:00AM</option>
@@ -147,15 +185,15 @@ export function AddActivities(){
                             <br/>
                             <div className={addactivitystyle.intensity_level}>
                                 <div>
-                                    <input type="radio" id="high" name="intensity" value="high"></input>
+                                    <input type="radio" id="high" name="intensity" value="high" onChange={handleInputChange} checked={formData.intensity === "high"}></input>
                                     <label htmlFor="high">High</label>
                                 </div>
                                 <div>
-                                    <input type="radio" id="medium" name="intensity" value="medium"></input>
+                                    <input type="radio" id="medium" name="intensity" value="medium" onChange={handleInputChange} checked={formData.intensity === "medium"}></input>
                                     <label htmlFor="medium">Medium</label>
                                 </div>
                                 <div>
-                                    <input type="radio" id="low" name="intensity" value="low"></input>
+                                    <input type="radio" id="low" name="intensity" value="low" onChange={handleInputChange} checked={formData.intensity === "low"}></input>
                                     <label htmlFor="low">Low</label>
                                 </div>                            
                             </div>                        
@@ -164,7 +202,7 @@ export function AddActivities(){
                         <div className={addactivitystyle.location_input}>
                             <label htmlFor="location">Location:</label>
                             <br/>
-                            <select className={addactivitystyle.location_select} name="location" id="location">                        
+                            <select className={addactivitystyle.location_select} name="location" id="location" value={formData.location} onChange={handleInputChange}>                        
                                 <option value="EMPTY">Select Location</option>
                                 <option value="Ang Mo Kio">Ang Mo Kio</option>
                                 <option value="Bedok">Bedok</option>
@@ -223,10 +261,23 @@ export function AddActivities(){
                             </select>
                         </div>
 
-                        <button className={addactivitystyle.plan_activity}>Plan Activity</button>
+                        <button className={addactivitystyle.plan_activity} type="submit">Plan Activity</button>
                     </form>
 
-                    <button className={addactivitystyle.btn_healthbuddy}>
+                    {showhealthbuddy? 
+                        <div className={addactivitystyle.Healthbuddy}>
+                            <div className={addactivitystyle.Health_buddy_header}>
+                                <div className={addactivitystyle.health_buddy_logo}>    
+                                    <img src={Healthbuddyicon}/>
+                                    <h4>HealthBuddy</h4>
+                                </div>
+                                <button className={addactivitystyle.Close_Health_buddy} onClick={()=> setShowHealthbuddy(false)}>X</button>
+                            </div>
+                            <Healthbuddy/>
+                        </div>:null
+                    }
+
+                    <button className={addactivitystyle.btn_healthbuddy} onClick={()=>setShowHealthbuddy(!showhealthbuddy)}>
                         <img src={Healthbuddyicon}></img>
                         <p>Health Buddy</p>
                     </button>

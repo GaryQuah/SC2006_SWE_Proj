@@ -35,15 +35,8 @@ body{
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    height: 90vh;
     display: flex;
     flex-direction: column;
-}
-
-a{
-    color: #000000;
-    text-decoration: none;
-    padding: 0.25em;
 }
 
 h2{
@@ -209,6 +202,65 @@ form{
     width: 100%;
     height: 3em;
     border-radius: 0.8em;
+    cursor: pointer;
+}
+
+.plan_activity:hover{
+    background-color: #444;
+    border: none;
+}
+
+/*heathbuddy chatwindow*/
+
+.Healthbuddy{
+    border-radius: var(--border-radius);
+    height: 20em;
+    width: 15em;
+    position: absolute;
+    z-index: 1;
+    align-self: center;
+    top: 28%;
+}
+
+.Health_buddy_header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #1dce23;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: 0;
+}
+
+.health_buddy_logo{
+    margin: 0.5em;
+    margin-left: 0.3em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2em;
+}
+
+.health_buddy_logo img{
+    max-width: 24px;
+    max-height: 24px;
+    border: solid 1px #000000;
+    border-radius: 50%;
+    background-color: #4caf50;
+}
+
+.health_buddy_logo h4{
+    margin: 0;
+    height: max-content;
+}
+
+.Close_Health_buddy{
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    cursor: pointer;
+    max-height: 30px;
+    margin: auto;
+    margin-right: 0.2em;
 }
 
 .btn_healthbuddy{
@@ -224,6 +276,11 @@ form{
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.3em;
+    cursor: pointer;
+}
+
+.btn_healthbuddy:hover{
+    background-color: #1dce23;
 }
 
 .btn_healthbuddy img{

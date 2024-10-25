@@ -9,8 +9,8 @@ export function Footer(){
         <footer>
             <ul className="nav">
                 <li><NavLink to="/dashboard"><img src={Homeicon}></img></NavLink></li>
-                <li><NavLink to="/"><img src={Rewardicon}></img></NavLink></li>
-                <li><NavLink to="/"><img src={Settingsicon}></img></NavLink></li>
+                <li><NavLink to="/rewards"><img src={Rewardicon}></img></NavLink></li>
+                <li><NavLink to="/settings"><img src={Settingsicon}></img></NavLink></li>
             </ul>
         </footer>
     )

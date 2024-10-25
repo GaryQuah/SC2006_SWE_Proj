@@ -43,7 +43,7 @@ body{
     background-attachment: fixed;
 }
 
-main{
+.main_main{
     margin: 0.5em;
     min-height: max-content;
 }
@@ -261,6 +261,59 @@ img{
     padding: 0.5em;
 }
 
+/*heathbuddy chatwindow*/
+
+.Healthbuddy{
+    border-radius: var(--border-radius);
+    height: 20em;
+    width: 15em;
+    position: absolute;
+    z-index: 1;
+    left: 20%;
+    top: 15%;
+}
+
+.Health_buddy_header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #1dce23;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: 0;
+}
+
+.health_buddy_logo{
+    margin: 0.5em;
+    margin-left: 0.3em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2em;
+}
+
+.health_buddy_logo img{
+    max-width: 24px;
+    max-height: 24px;
+    border: solid 1px #000000;
+    border-radius: 50%;
+    background-color: #4caf50;
+}
+
+.health_buddy_logo h4{
+    margin: 0;
+    height: max-content;
+}
+
+.Close_Health_buddy{
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    cursor: pointer;
+    max-height: 30px;
+    margin: auto;
+    margin-right: 0.2em;
+}
+
 /*chat bot and claim rewards button*/
 .btn_group2{
     display: flex;
@@ -289,6 +342,13 @@ img{
     width: 100%;
     height: 100%;
     gap: 0.3em;
+    cursor: pointer;
+    transition-duration: 0.3s;
+    border-radius: var(--border-radius);
+}
+
+.btn_healthbuddy:hover{
+    background-color: #1dce23;
 }
 
 .btn_healthbuddy img{
@@ -333,7 +393,7 @@ img{
 
 @media (width <= 410px){
 
-    main{
+    .main_main{
         min-height: max-content;
     }
     .user_points{
@@ -371,6 +431,11 @@ img{
         margin-top: 0;
     }
 
+    .Healthbuddy{
+        left: 12%;
+        top: 20%
+    }
+
     .btn_group2{
         display: flex;
         flex-direction: column;
@@ -384,6 +449,13 @@ img{
 
     .btn_reward{
         width: auto;
+    }
+}
+
+@media (width <= 398px){
+    .Healthbuddy{
+        left: 12%;
+        top: 36%
     }
 }
 

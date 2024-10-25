@@ -2,13 +2,13 @@ import {Footer} from "../Components/Footer"
 import Calendericon from "../assets/Calender icon.png"
 import Healthbuddyicon from "../assets/Chatbot white Icon.png"
 import Rewardicon from "../assets/Hand Reward icon.png"
-import Menuicon from "../assets/Menu.png"
 import Hikingicon from "../assets/Hiking icon.png"
 import Usericon from "../assets/User icon.png"
 import {Link, NavLink} from "react-router-dom"
 import dashboardstyle from "./css/Dashboard.module.css"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { Healthbuddy } from "../Components/Healthbuddy"
 
 export function Dashboard(){
     
@@ -16,6 +16,7 @@ export function Dashboard(){
     const WeatherAPI=import.meta.env.VITE_OPENWEATHER_WEATHER_API_KEY;
     const [UVData, setUVData] = useState([]);
     const [WeatherData, setWeatherData] = useState([]);
+    const [showhealthbuddy, setShowHealthbuddy] = useState(false);
     
     const getUVData = () =>{
         axios.get(UVAPI)
@@ -48,11 +49,7 @@ export function Dashboard(){
         <>
             <div className={dashboardstyle.main_grid}>
                 <div className={dashboardstyle.header}>
-                    <div className={dashboardstyle.menu_logo}>
-                        <button className={dashboardstyle.menu_button}>
-                            <img src={Menuicon} className={dashboardstyle.menu}></img>
-                        </button>
-                        
+                    <div className={dashboardstyle.menu_logo}>                        
                         <div>
                             <NavLink to="/dashboard" className={dashboardstyle.logo}>
                                 <img src={Hikingicon}></img>
@@ -104,7 +101,7 @@ export function Dashboard(){
                     
                     <div className={dashboardstyle.btn_group2}>
                         <div className={dashboardstyle.div_healthbuddy}>
-                            <button className={dashboardstyle.btn_healthbuddy}>
+                            <button className={dashboardstyle.btn_healthbuddy} onClick={()=>setShowHealthbuddy(!showhealthbuddy)}>
                                 <img src={Healthbuddyicon}></img>
                                 <p>Health Buddy</p>
                             </button>
@@ -115,8 +112,21 @@ export function Dashboard(){
                             <p>Claim Rewards</p>
                         </Link>
                     </div>
+
+                    {showhealthbuddy? 
+                        <div className={dashboardstyle.Healthbuddy}>
+                            <div className={dashboardstyle.Health_buddy_header}>
+                                <div className={dashboardstyle.health_buddy_logo}>    
+                                    <img src={Healthbuddyicon}/>
+                                    <h4>HealthBuddy</h4>
+                                </div>
+                                <button className={dashboardstyle.Close_Health_buddy} onClick={()=> setShowHealthbuddy(false)}>X</button>
+                            </div>
+                            <Healthbuddy/>
+                        </div>:null
+                    }
                 </main>
-            </div>
+            </div>            
             <Footer/>
         </>
     )

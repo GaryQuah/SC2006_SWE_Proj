@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom"
-import Menuicon from "../assets/Menu.png"
 import Hikingicon from "../assets/Hiking icon.png"
 import Usericon from "../assets/User icon.png"
 import "./css/Header.css"
@@ -8,10 +7,6 @@ export function Header(){
     return(
         <div className="header">
             <div className="menu-logo">
-                <button className="menu-button">
-                    <img src={Menuicon} className="menu"></img>
-                </button>
-                
                 <div>
                     <NavLink to="/dashboard" className="logo">
                         <img src={Hikingicon}></img>
