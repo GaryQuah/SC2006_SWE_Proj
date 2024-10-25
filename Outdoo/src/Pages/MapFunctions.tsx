@@ -56,7 +56,7 @@ const containerStyle = {
   height: "86vh",
 };
 
-const center = { lat: 1.290270, lng: 103.851959 }; // Default center position
+const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
 
 const ActivitiesList = [
   "Yoga",
