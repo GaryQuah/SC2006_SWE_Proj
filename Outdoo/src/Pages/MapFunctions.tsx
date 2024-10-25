@@ -139,6 +139,55 @@ export function MapFunctions() {
   const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
   const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
+  //For activity locations
+  const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
+  const [activityLocations, setActivityLocations] = useState<Place[]>([]);
+
+  const fetchActivityLocations = (activity: string, location: LatLng) => {
+    const service = new window.google.maps.places.PlacesService(mapRef.current!);
+    service.nearbySearch(
+      {
+        location: location,
+        radius: 10000, // Search within 10 km
+        keyword: activity, // Use the selected activity as a keyword
+      },
+      (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+          const convertedResults: Place[] = results.map((result) => {
+            const location = result.geometry?.location;
+
+            // Ensure location is defined and convert it
+            const latLng: LatLng = {
+              lat: location ? location.lat() : 0,
+              lng: location ? location.lng() : 0,
+            };
+
+            return {
+              place_id: result.place_id || "",
+              name: result.name || "",
+              vicinity: result.vicinity || "",
+              geometry: { location: latLng },
+              photos: result.photos?.map((photo) => ({
+                getUrl: photo.getUrl,
+              })),
+            };
+          });
+
+          setActivityLocations(convertedResults); // Set the fetched locations to state
+        } else {
+          console.error(`Error fetching locations: ${status}`);
+        }
+      }
+    );
+  };
+
+  const handleActivityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedActivity(e.target.value);
+    if (mapRef.current) {
+      fetchActivityLocations(e.target.value, center); // Fetch locations based on the selected activity
+    }
+  };
+
   const fetchWeatherDataOrigin = async () => {
 
     try {
@@ -200,7 +249,8 @@ const fetchWeatherDataEnd = async () => {
         setOriginPointName(results[0].formatted_address); // Store origin name
         setOriginImage(`https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${originLatLng.lat},${originLatLng.lng}&key=${GMAPS_API_KEY}`); // Street View image for origin
         setOriginMarkerPosition(originLatLng);
-        setOpenOrigin(false);
+        console.log("Marker Position:", markerPosition);
+        setOpenOrigin(true);
         fetchWeatherDataOrigin();
   
         // Calculate random waypoint based on distance
@@ -430,6 +480,17 @@ const fetchWeatherDataEnd = async () => {
                     </NavLink>
                 </div>
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
+          <div>
+            <label>Select Activity: </label>
+            <select value={selectedActivity} onChange={handleActivityChange}>
+              {ActivitiesList.map((activity) => (
+                <option key={activity} value={activity}>
+                  {activity}
+                </option>
+              ))}
+            </select>
+          </div>
+
         <div>
           <input
             type="text"
@@ -464,6 +525,7 @@ const fetchWeatherDataEnd = async () => {
             )}
 
             {/* Origin Marker */}
+            {markerPosition && (
           <Marker
             position={markerPosition}
             title="Origin"
@@ -475,6 +537,7 @@ const fetchWeatherDataEnd = async () => {
               setOpenOrigin(true); // Open origin InfoWindow
             }}
           />
+        )}
 
           {/* Waypoint Marker */}
           {_waypoint && (
@@ -496,7 +559,7 @@ const fetchWeatherDataEnd = async () => {
             <InfoWindow position={markerPosition} onCloseClick={() => setOpenOrigin(false)}>
               <div>
                 <p>Origin: {_originPointName}</p>
-                
+
                 {_originWeatherData && _originWeatherData.main && (
                 <p>Temperature: {_originWeatherData.main.temp} °C</p>
                 )}
@@ -593,6 +656,16 @@ const fetchWeatherDataEnd = async () => {
                 </div>
               </InfoWindow>
             )}
+
+            {/* Markers for activity locations */}
+            {activityLocations.map((location) => (
+              <Marker
+                key={location.place_id}
+                position={location.geometry.location}
+                title={location.name}
+                onClick={() => console.log(location.name)} // Add custom click handler if needed
+              />
+            ))}
           </GoogleMap>
         </div>
       </LoadScript>
