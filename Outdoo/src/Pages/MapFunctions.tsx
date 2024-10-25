@@ -532,21 +532,6 @@ const fetchWeatherDataEnd = async () => {
               />
             )}
 
-            {/* Origin Marker */}
-            {markerPosition && (
-          <Marker
-            position={markerPosition}
-            title="Origin"
-            icon={{
-              url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
-              scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
-            }}
-            onClick={() => {
-              setOpenOrigin(true); // Open origin InfoWindow
-            }}
-          />
-        )}
-
           {/* Waypoint Marker */}
           {_waypoint && (
             <Marker
@@ -558,6 +543,21 @@ const fetchWeatherDataEnd = async () => {
               }}
               onClick={() => {
                 setOpenWaypoint(true); // Open waypoint InfoWindow
+              }}
+            />
+          )}
+
+          {/* Origin Marker */}
+          {markerPosition && (
+            <Marker
+              position={markerPosition}
+              title="Random Waypoint"
+              icon={{
+                url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+              }}
+              onClick={() => {
+                setOpenOrigin(true); // Open waypoint InfoWindow
               }}
             />
           )}
@@ -671,7 +671,7 @@ const fetchWeatherDataEnd = async () => {
                 key={location.place_id}
                 position={location.geometry.location}
                 title={location.name}
-                onClick={() => console.log(location.name)} // Add custom click handler if needed
+                //onClick={() => console.log(location.name)}
               />
             ))}
           </GoogleMap>
