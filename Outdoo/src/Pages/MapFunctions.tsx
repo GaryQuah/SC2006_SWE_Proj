@@ -101,29 +101,41 @@ const ActivitiesList = [
 
 
 export function MapFunctions() {  
-  
+  //Values
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [postalCode, setPostalCode] = useState<string>("");
   const [distance, setDistance] = useState<string>("");
-  const [_waypoint, setWaypoint] = useState<LatLng[] | null>(null);
+
+  //Display waypoint - if there is waypoint auto display on map
+  const [_waypoint, setWaypoint] = useState<LatLng | null>(null);
   const [_openOrigin, setOpenOrigin] = useState<boolean>(false);
+
   const [_openWaypoint, setOpenWaypoint] = useState<boolean>(false);
   const [markerPosition, setOriginMarkerPosition] = useState<LatLng>(center);
   const [endPointPosition, setEndMarkerPosition] = useState<LatLng>(center);
+  const mapRef = useRef<google.maps.Map | null>(null);
+
+  //Parks
   const [parks, setParks] = useState<Place[]>([]);
   const [selectedPark, setSelectedPark] = useState<Place | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
+
+  //Community center
   const [communityCenters, setCommunityCenters] = useState<Place[]>([]);
   const [selectedCommunityCenter, setSelectedCommunityCenter] = useState<Place | null>(null);
+
+  //Waypoints
   const [_originPointName, setOriginPointName] = useState<string>("");
   const [_endPointName, setEndPointName] = useState<string>("");
   const [_originImage, setOriginImage] = useState<string>("");
   const [_endImage, setEndImage] = useState<string>("");
+
+  //Weather Data
   const [_originWeatherData, setOriginWeatherData] = useState<WeatherData | null>(null);
   const [_originUVData, setOriginUVData] = useState<UvData | null>(null);
   const [_endpointWeatherData, setEndWeatherData] = useState<WeatherData | null>(null);
   const [_endpointUVData, setEndUVData] = useState<UvData | null>(null);
 
+  //API Keys - Change when / where needed
   const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
   const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
@@ -193,7 +205,7 @@ const fetchWeatherDataEnd = async () => {
   
         // Calculate random waypoint based on distance
         const randomWaypoint = getRandomWaypoint(originLatLng, parseFloat(distance));
-        setWaypoint([randomWaypoint]);
+        setWaypoint(randomWaypoint);
 
         // Geocode the waypoint location
         geocoder.geocode({ location: randomWaypoint }, (results, status) => {
@@ -250,7 +262,7 @@ const fetchWeatherDataEnd = async () => {
           const loopWaypoints = Array.from({ length: numberOfWaypoints }, () =>
             getRandomWaypoint(originLatLng, parseFloat(distance) ) //* 0.621371
           );
-          setWaypoint(loopWaypoints);
+          //setWaypoint(loopWaypoints[0]); - Since its to origin theres no need to render out the "endpoint"
   
           const directionsService = new window.google.maps.DirectionsService();
           directionsService.route(
@@ -450,6 +462,76 @@ const fetchWeatherDataEnd = async () => {
                 options={{ suppressMarkers: true }}
               />
             )}
+
+            {/* Origin Marker */}
+          <Marker
+            position={markerPosition}
+            title="Origin"
+            icon={{
+              url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+              scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+            }}
+            onClick={() => {
+              setOpenOrigin(true); // Open origin InfoWindow
+            }}
+          />
+
+          {/* Waypoint Marker */}
+          {_waypoint && (
+            <Marker
+              position={_waypoint}
+              title="Random Waypoint"
+              icon={{
+                url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+              }}
+              onClick={() => {
+                setOpenWaypoint(true); // Open waypoint InfoWindow
+              }}
+            />
+          )}
+          
+          {/* InfoWindow for the origin marker */}
+          {_openOrigin && (
+            <InfoWindow position={markerPosition} onCloseClick={() => setOpenOrigin(false)}>
+              <div>
+                <p>Origin: {_originPointName}</p>
+                
+                {_originWeatherData && _originWeatherData.main && (
+                <p>Temperature: {_originWeatherData.main.temp} °C</p>
+                )}
+                {_originWeatherData && _originWeatherData.weather && _originWeatherData.weather[0] && (
+                  <p>Weather: {_originWeatherData.weather[0].description}</p>
+                )}
+                {_originUVData && (
+                  <p>UV Index: {_originUVData.value}</p>
+                )}
+
+                {_originImage && <img src={_originImage} alt="Origin" style={{ width: "100px", height: "100px" }} />} {/* Display origin image */}
+              </div>
+            </InfoWindow>
+          )}
+
+          {/* InfoWindow for the waypoint marker */}
+          {_openWaypoint && _waypoint  && (
+            <InfoWindow position={_waypoint} onCloseClick={() => setOpenWaypoint(false)}>
+              <div>
+                <p>EndPoint: {_endPointName}</p>
+
+                {_endpointWeatherData && _endpointWeatherData.main && (
+                <p>Temperature: {_endpointWeatherData.main.temp} °C</p>
+                )}
+                {_endpointWeatherData && _endpointWeatherData.weather && _endpointWeatherData.weather[0] && (
+                  <p>Weather: {_endpointWeatherData.weather[0].description}</p>
+                )}
+                {_endpointUVData && (
+                  <p>UV Index: {_endpointUVData.value}</p>
+                )}
+                
+                {_endImage && <img src={_endImage} alt="Endpoint" style={{ width: "100px", height: "100px" }} />} {/* Display endpoint image */}
+              </div>
+            </InfoWindow>
+          )}
 
             {/* Markers for parks */}
             {parks.map((park) => (
