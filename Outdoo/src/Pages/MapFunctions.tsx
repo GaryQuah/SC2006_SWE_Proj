@@ -106,6 +106,9 @@ export function MapFunctions() {
   const [postalCode, setPostalCode] = useState<string>("");
   const [distance, setDistance] = useState<string>("");
 
+  //Icon Size of Markers
+  const iconSize = window.google ? new window.google.maps.Size(30, 30) : null;
+ 
   //Display waypoint - if there is waypoint auto display on map
   const [_waypoint, setWaypoint] = useState<LatLng | null>(null);
   const [_openOrigin, setOpenOrigin] = useState<boolean>(false);
@@ -348,7 +351,6 @@ const fetchWeatherDataEnd = async () => {
     };
 
   const fetchParks = (location: LatLng) => {
-    resetMap();
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     service.nearbySearch(
       {
@@ -482,41 +484,38 @@ const fetchWeatherDataEnd = async () => {
                                 <h4>Outdoo</h4>
                             </NavLink>
                         </div>
+                  
                     </div>
                     <NavLink to="/" className={mapstyle.profile}>
                         <img src={Usericon}></img>
                     </NavLink>
                 </div>
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
-          <div>
-            <label>Select Activity: </label>
-            <select value={selectedActivity} onChange={handleActivityChange}>
-              {ActivitiesList.map((activity) => (
-                <option key={activity} value={activity}>
-                  {activity}
-                </option>
-              ))}
-            </select>
-          </div>
 
-        <div>
-          <input
-            type="text"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            placeholder="Enter postal code"
+
+          <div className={mapstyle.labelContainer}>
+          <label >Postal Code:</label>
+          <input className={mapstyle.searchInput1}
+              type="text"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)}
+              placeholder="Enter postal code"
           />
-          <input
-            type="number"
-            value={distance}
-            onChange={(e) => setDistance(e.target.value)}
-            placeholder="Distance (km)"
+
+          <label  >Distance (km):</label>
+          <input className={mapstyle.searchInput2}
+              type="number"
+              value={distance}
+              onChange={(e) => setDistance(e.target.value)}
+              placeholder="Distance (km)"
           />
-          <button onClick={generateRoute}>Generate Route</button>
-          <button onClick={generateLoop}>Generate Loop</button>
-          <button onClick={handleFetchParks}>Fetch Parks</button>
-          <button onClick={handleFetchCommunityCenters}>Fetch Community Centers</button> {/* New button */}
-          <button onClick={resetMap}>Reset Map</button>
+
+            <button className={mapstyle.button1} onClick={generateRoute}>Generate Route</button>
+            <button className={mapstyle.button1}  onClick={generateLoop}>Generate Loop</button>
+        </div>
+
+        
+        <div className={mapstyle.container}>
 
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -539,7 +538,7 @@ const fetchWeatherDataEnd = async () => {
               title="Random Waypoint"
               icon={{
                 url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
-                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+                scaledSize: iconSize
               }}
               onClick={() => {
                 setOpenWaypoint(true); // Open waypoint InfoWindow
@@ -554,7 +553,7 @@ const fetchWeatherDataEnd = async () => {
               title="Random Waypoint"
               icon={{
                 url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
-                scaledSize: new window.google.maps.Size(30, 30), // Scale to desired size
+                scaledSize: iconSize // Scale to desired size
               }}
               onClick={() => {
                 setOpenOrigin(true); // Open waypoint InfoWindow
@@ -566,19 +565,21 @@ const fetchWeatherDataEnd = async () => {
           {_openOrigin && (
             <InfoWindow position={markerPosition} onCloseClick={() => setOpenOrigin(false)}>
               <div>
-                <p>Origin: {_originPointName}</p>
+                <p> <strong> Origin:</strong> {_originPointName}</p>
 
+              <div className={mapstyle.infoWindowtext}>
+              {_originImage && <img  className={mapstyle.img} src={_originImage} alt="Origin" style={{ width: "100px", height: "100px" }} />} {/* Display origin image */}
                 {_originWeatherData && _originWeatherData.main && (
-                <p>Temperature: {_originWeatherData.main.temp} °C</p>
+                <p><strong>Temperature:</strong> {_originWeatherData.main.temp} °C</p>
                 )}
                 {_originWeatherData && _originWeatherData.weather && _originWeatherData.weather[0] && (
-                  <p>Weather: {_originWeatherData.weather[0].description}</p>
+                  <p><strong>Weather:</strong>{_originWeatherData.weather[0].description}</p>
                 )}
                 {_originUVData && (
-                  <p>UV Index: {_originUVData.value}</p>
+                  <p><strong>UV Index:</strong> {_originUVData.value}</p>
                 )}
 
-                {_originImage && <img src={_originImage} alt="Origin" style={{ width: "100px", height: "100px" }} />} {/* Display origin image */}
+                </div>
               </div>
             </InfoWindow>
           )}
@@ -586,21 +587,19 @@ const fetchWeatherDataEnd = async () => {
           {/* InfoWindow for the waypoint marker */}
           {_openWaypoint && _waypoint  && (
             <InfoWindow position={_waypoint} onCloseClick={() => setOpenWaypoint(false)}>
-              <div>
-                <p>EndPoint: {_endPointName}</p>
-
+              <div className={mapstyle.infoWindowtext}>
+                <p><strong>EndPoint:</strong> {_endPointName}</p>
+                {_endImage && <img src={_endImage} alt="Endpoint" style={{ width: "100px", height: "100px" }} />} {/* Display endpoint image */}
                 {_endpointWeatherData && _endpointWeatherData.main && (
-                <p>Temperature: {_endpointWeatherData.main.temp} °C</p>
+                <p><strong> Temperature:</strong> {_endpointWeatherData.main.temp} °C</p>
                 )}
                 {_endpointWeatherData && _endpointWeatherData.weather && _endpointWeatherData.weather[0] && (
-                  <p>Weather: {_endpointWeatherData.weather[0].description}</p>
+                  <p><strong>Weather:</strong> {_endpointWeatherData.weather[0].description}</p>
                 )}
                 {_endpointUVData && (
-                  <p>UV Index: {_endpointUVData.value}</p>
+                  <p><strong>UV Index:</strong> {_endpointUVData.value}</p>
                 )}
-                
-                {_endImage && <img src={_endImage} alt="Endpoint" style={{ width: "100px", height: "100px" }} />} {/* Display endpoint image */}
-              </div>
+                              </div>
             </InfoWindow>
           )}
 
@@ -612,7 +611,7 @@ const fetchWeatherDataEnd = async () => {
                 title={park.name}
                 icon={{
                   url: "https://icon-library.com/images/park-icon-png/park-icon-png-9.jpg",
-                  scaledSize: new window.google.maps.Size(30, 30),
+                  scaledSize: iconSize
                 }}
                 onClick={() => handleMarkerClick(park)}
               />
@@ -626,7 +625,7 @@ const fetchWeatherDataEnd = async () => {
                 title={center.name}
                 icon={{
                   url: "https://icon-library.com/images/24591-200.png", // Custom icon for community centers
-                  scaledSize: new window.google.maps.Size(30, 30),
+                  scaledSize: iconSize
                 }}
                 onClick={() => handleCommunityCenterClick(center)}
               />
@@ -655,7 +654,7 @@ const fetchWeatherDataEnd = async () => {
                   <h4>{selectedPark.name}</h4>
                   <p>{selectedPark.vicinity}</p>
                   {selectedPark.photos && (
-                    <img
+                    <img 
                       src={selectedPark.photos[0].getUrl()}
                       alt={selectedPark.name}
                       style={{ width: "100px", height: "100px" }}
@@ -675,6 +674,22 @@ const fetchWeatherDataEnd = async () => {
               />
             ))}
           </GoogleMap>
+
+          <div className={mapstyle.rightPanel}>
+          <label>Filter By Activity: </label>
+            <select className={mapstyle.activitySelect}  value={selectedActivity} onChange={handleActivityChange}>
+              {ActivitiesList.map((activity) => (
+                <option key={activity} value={activity}>
+                  {activity}
+                </option>
+              ))}
+
+            </select>
+          <button className={mapstyle.button2} onClick={handleFetchParks}>Fetch Parks</button>
+          <button className={mapstyle.button2}  onClick={handleFetchCommunityCenters}>Fetch Community Centers</button> {/* New button */}
+          <button className={mapstyle.button3} onClick={resetMap}>Reset Map</button>
+          </div>
+
         </div>
       </LoadScript>
     </div>
