@@ -3,7 +3,7 @@ import { Dashboard } from "./Pages/Dashboard"
 import { AddActivities } from "./Pages/AddActivities"
 import { MapFunctions } from "./Pages/MapFunctions"
 import { Login } from "./Pages/Login"
-import { Rewards } from './Pages/Rewards'
+import  Rewards  from './Pages/Rewards'
 
 function App() {
   return (
