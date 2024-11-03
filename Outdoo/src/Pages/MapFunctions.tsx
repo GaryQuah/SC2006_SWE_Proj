@@ -127,6 +127,12 @@ export function MapFunctions() {
   const [communityCenters, setCommunityCenters] = useState<Place[]>([]);
   const [selectedCommunityCenter, setSelectedCommunityCenter] = useState<Place | null>(null);
 
+  //For activity locations
+  const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
+  const [activityLocations, setActivityLocations] = useState<Place[]>([]);
+  const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
+  const [selectedActivityLocations, setSelectedActivityLocations] = useState<Place | null>(null);
+
   //Waypoints
   const [_originPointName, setOriginPointName] = useState<string>("");
   const [_endPointName, setEndPointName] = useState<string>("");
@@ -266,6 +272,10 @@ const fetchWeatherDataEnd = async () => {
   };
 
   const handleCommunityCenterClick = (center: Place) => {
+    setSelectedCommunityCenter(center); // Set selected community center when clicked
+  };
+
+  const handleActivityClick = (center: Place) => {
     setSelectedCommunityCenter(center); // Set selected community center when clicked
   };
 
@@ -658,6 +668,33 @@ const fetchWeatherDataEnd = async () => {
               />
             ))}
 
+             {/* Markers for activity locations */}
+             {showActivityMarkers && activityLocations.map((location) => (
+              <Marker
+                key={location.place_id}
+                position={location.geometry.location}
+                title={location.name}
+                icon={{
+                  url: "https://icon-library.com/images/exercise-icon-png/exercise-icon-png-15.jpg", // Use your custom logo URL
+                  scaledSize: iconSize // Scale to desired size
+                }}
+                onClick={() => handleActivityClick(location)}
+              />
+            ))}
+
+             {/* InfoWindow for selected Activity location */}
+             {selectedCommunityCenter && (
+              <InfoWindow
+                position={selectedCommunityCenter.geometry.location}
+                onCloseClick={() => setSelectedActivityLocations(null)}
+              >
+                <div>
+                  <h4>{selectedCommunityCenter.name}</h4>
+                  <p>{selectedCommunityCenter.vicinity}</p>
+                </div>
+              </InfoWindow>
+            )}
+
             {/* InfoWindow for selected community center */}
             {selectedCommunityCenter && (
               <InfoWindow
@@ -691,15 +728,7 @@ const fetchWeatherDataEnd = async () => {
               </InfoWindow>
             )}
 
-            {/* Markers for activity locations */}
-            {showActivityMarkers && activityLocations.map((location) => (
-              <Marker
-                key={location.place_id}
-                position={location.geometry.location}
-                title={location.name}
-                //onClick={() => console.log(location.name)}
-              />
-            ))}
+           
           </GoogleMap>
 
           <div className={mapstyle.rightPanel}>
