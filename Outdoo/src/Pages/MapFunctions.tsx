@@ -58,7 +58,10 @@ const containerStyle = {
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
 
-const ActivitiesList = [
+const [indoorActivities, setIndoorActivities] = useState<string[]>([]); 
+    const [outdoorActivities, setOutdoorActivities] = useState<string[]>([]); 
+    const [ActivitiesList, setActivitiesList] = useState<string[]>([]);
+/*const ActivitiesList = [
   "Yoga",
   "Pilates",
   "Gym",
@@ -97,7 +100,7 @@ const ActivitiesList = [
   "Trail Running",
   "Frisbee",
   "Kite Flying",
-];
+];*/
 
 
 export function MapFunctions() {  
@@ -147,6 +150,25 @@ export function MapFunctions() {
   const [activityLocations, setActivityLocations] = useState<Place[]>([]);
   const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
 
+    const fetchActivities = async () => {
+      try {
+          const response = await fetch('/your_endpoint', {
+              method: 'POST', // or 'GET' based on your logic
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ /* your payload if needed */ }),
+          });
+
+          const data = await response.json();
+          setIndoorActivities(data.indoor_activities);
+          setOutdoorActivities(data.outdoor_activities);
+
+          setActivitiesList([...data.indoor_activities, ...data.outdoor_activities]);
+      } catch (error) {
+          console.error('Error fetching activities:', error);
+      }
+  };
 
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
@@ -232,6 +254,8 @@ const fetchWeatherDataEnd = async () => {
 
   const handleLoad = (map: google.maps.Map) => {
     mapRef.current = map;
+
+    fetchActivities();
   };
 
   const handleMarkerClick = (park: Place) => {
