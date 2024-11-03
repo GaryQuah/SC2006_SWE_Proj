@@ -101,6 +101,14 @@ def home():
 
                 update_json_file(current_user.id, description, temperature, uv_index, uv_description)
 
+                 # Prepare response data
+                response_data = {
+                    'indoor_activities': indoor_activities,
+                    'outdoor_activities': outdoor_activities
+                }
+
+                return jsonify(response_data)  # Return JSON response
+
     return render_template(
         "home.html", 
         user=current_user, 

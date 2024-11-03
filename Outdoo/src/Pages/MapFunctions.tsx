@@ -58,6 +58,7 @@ const containerStyle = {
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
 
+/*
 const ActivitiesList = [
   "Yoga",
   "Pilates",
@@ -97,7 +98,7 @@ const ActivitiesList = [
   "Trail Running",
   "Frisbee",
   "Kite Flying",
-];
+];*/
 
 
 export function MapFunctions() {  
@@ -147,6 +148,44 @@ export function MapFunctions() {
   const [activityLocations, setActivityLocations] = useState<Place[]>([]);
   const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
 
+  //Fetch activity data from get activity page
+  const [indoorActivities, setIndoorActivities] = useState<string[]>([]); // Specify type as string[]
+  const [outdoorActivities, setOutdoorActivities] = useState<string[]>([]); // Specify type as string[]
+  const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
+
+  const fetchActivities = async () => {
+    try {
+        const requestBody = {
+            // Include any necessary data your Flask route expects
+            // For example, if you're updating points or submitting an activity:
+            // activity: selectedActivity, // Change 'selectedActivity' to your actual variable
+            // location: selectedLocation,   // Change 'selectedLocation' to your actual variable
+            // time: selectedTime             // Change 'selectedTime' to your actual variable
+        };
+
+        const response = await fetch('/', { // Use the root endpoint defined in Flask
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody), // Send the constructed body
+        });
+
+        // Check if the response is OK (status code in the range 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setIndoorActivities(data.indoor_activities);
+        setOutdoorActivities(data.outdoor_activities);
+
+        // Combine indoor and outdoor activities
+        setActivitiesList([...data.indoor_activities, ...data.outdoor_activities]);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+    }
+};
 
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
@@ -232,6 +271,8 @@ const fetchWeatherDataEnd = async () => {
 
   const handleLoad = (map: google.maps.Map) => {
     mapRef.current = map;
+
+    fetchActivities();
   };
 
   const handleMarkerClick = (park: Place) => {
