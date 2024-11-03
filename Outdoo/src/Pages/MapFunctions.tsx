@@ -149,11 +149,6 @@ export function MapFunctions() {
   const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
   const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
-  //For activity locations
-  const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
-  const [activityLocations, setActivityLocations] = useState<Place[]>([]);
-  const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
-
   //Fetch activity data from get activity page
   const [indoorActivities, setIndoorActivities] = useState<string[]>([]); // Specify type as string[]
   const [outdoorActivities, setOutdoorActivities] = useState<string[]>([]); // Specify type as string[]
