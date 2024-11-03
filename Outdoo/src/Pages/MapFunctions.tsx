@@ -155,26 +155,13 @@ export function MapFunctions() {
 
   const fetchActivities = async () => {
     try {
-        const requestBody = {
-            // Include any necessary data your Flask route expects
-            // For example, if you're updating points or submitting an activity:
-            // activity: selectedActivity, // Change 'selectedActivity' to your actual variable
-            // location: selectedLocation,   // Change 'selectedLocation' to your actual variable
-            // time: selectedTime             // Change 'selectedTime' to your actual variable
-        };
-
         const response = await fetch('/', { // Use the root endpoint defined in Flask
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestBody), // Send the constructed body
+            body: JSON.stringify({ /* your payload if needed */ }),
         });
-
-        // Check if the response is OK (status code in the range 200-299)
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         const data = await response.json();
         setIndoorActivities(data.indoor_activities);
@@ -186,7 +173,6 @@ export function MapFunctions() {
         console.error('Error fetching activities:', error);
     }
 };
-
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     service.nearbySearch(
