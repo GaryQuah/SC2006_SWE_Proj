@@ -58,6 +58,7 @@ const containerStyle = {
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
 
+/*
 const ActivitiesList = [
   "Yoga",
   "Pilates",
@@ -97,7 +98,7 @@ const ActivitiesList = [
   "Trail Running",
   "Frisbee",
   "Kite Flying",
-];
+];*/
 
 
 export function MapFunctions() {  
@@ -148,6 +149,31 @@ export function MapFunctions() {
   const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
   const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
+  //Fetch activity data from get activity page
+  const [indoorActivities, setIndoorActivities] = useState<string[]>([]); // Specify type as string[]
+  const [outdoorActivities, setOutdoorActivities] = useState<string[]>([]); // Specify type as string[]
+  const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
+
+  const fetchActivities = async () => {
+    try {
+        const response = await fetch('/', { // Use the root endpoint defined in Flask
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ /* your payload if needed */ }),
+        });
+
+        const data = await response.json();
+        setIndoorActivities(data.indoor_activities);
+        setOutdoorActivities(data.outdoor_activities);
+
+        // Combine indoor and outdoor activities
+        setActivitiesList([...data.indoor_activities, ...data.outdoor_activities]);
+    } catch (error) {
+        console.error('Error fetching activities:', error);
+    }
+};
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     service.nearbySearch(
@@ -232,6 +258,8 @@ const fetchWeatherDataEnd = async () => {
 
   const handleLoad = (map: google.maps.Map) => {
     mapRef.current = map;
+
+    fetchActivities();
   };
 
   const handleMarkerClick = (park: Place) => {
