@@ -5,7 +5,7 @@
 
 ## Screenshots
 Instruction:
-![instruction]([https://github.com/GaryQuah/SC2006_SWE_Proj/blob/JamesTzh-integrated-backend-v1/instructions.png])
+![instruction](https://github.com/GaryQuah/SC2006_SWE_Proj/blob/JamesTzh-integrated-backend-v1/instructions.png)
 
 to run react side: navigate to outdoo folder and type "npm run dev"
 to run backend: navigate to Backend by typing "cd backend", then "py app.py"
