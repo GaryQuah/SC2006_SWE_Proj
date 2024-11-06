@@ -1,0 +1,569 @@
+:root{
+    --clr-text: #000000;
+    --clr-Information: #519A09;
+    --clr-background: #E0F2CE;
+    --clr-background-accent: #E7EAEE;
+    --clr-background-dark-accent: #519A09;
+
+    --ff-sansserif: sans-serif;
+    --ff-logo: sans-serif;
+
+    --border-radius: 1em;
+    --bg-color: rgba(255, 255, 255, 0.659);
+    --border-color: black 3px solid;
+    --min-realtime-size: 6rem;
+    --max-realtime-size: 10rem;
+    --top-margin: 1em;
+    --inf-size: 1.75em;
+    --activity-size: 1.25em;
+}
+
+html{
+    box-sizing: border-box;
+    font-family: var(--ff-sansserif);
+    color: var(--clr-text);
+}
+
+body{
+    margin: 0;
+}
+
+.main_grid{
+    margin: 0;
+    margin-bottom: 0.3em;
+    padding: 0;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    background-image: url(../../assets/main-background.gif);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.main_main{
+    margin: 0.5em;
+    min-height: max-content;
+}
+
+i{
+    padding: auto;
+    padding-top: 0.6em;
+}
+
+a{
+    color: #000000;
+    text-decoration: none;
+    padding: 0.25em;
+}
+
+h2{
+    margin: 0;
+}
+
+p{
+    margin: 0;
+}
+
+.Information{
+    color: var(--clr-Information);
+}
+
+img{
+    width: auto;
+    height: auto;
+}
+
+/*Header section*/
+.header{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    box-shadow: 0px 3px 4px -4px #000000;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+img{
+    width: auto;
+    height: auto;
+}
+
+.menu_logo{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.menu_button{
+    border: none;
+    background: none;
+    margin-top: 1em;
+}
+
+.logo{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin-left: 0.5em;
+    align-items: center;
+    padding-top: 0.5em;
+    text-decoration: none;
+    color: #000000;
+}
+
+.logo img{
+    max-width: 1.5em;
+    max-height: 1.5em;
+}
+
+.logo h4{
+    font-size: 1.1em;
+}
+
+.profile{
+    margin-top: 1em;
+    margin-right: 0.3em;
+}
+
+/*User's point section*/
+
+.user_points{
+    display: flex;
+    background: linear-gradient(135deg, #d4ffd6, #c3f9cd);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.75em;
+    margin-top: var(--top-margin);
+    font-size: 1em;
+}
+
+/*Realtime information section*/
+
+.real_time_information{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.3em;
+    justify-content: space-between;
+}
+
+.real_time_information__UV{
+    min-height: var(--min-realtime-size);
+    width: var(--max-realtime-size);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    padding: 0.75em;
+    margin-top: var(--top-margin);
+    background: linear-gradient(135deg, #fff3e0, #ffd54f);
+}
+
+.real_time_information__UV h2, p{
+    text-align: center;
+    margin: 0.5em;
+}
+
+.real_time_information__Weather{
+    min-height: var(--min-realtime-size);
+    width: var(--max-realtime-size);
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    padding: 0.75em;
+    margin-top: var(--top-margin);
+    background: linear-gradient(135deg, #e3f2fd, #90caf9);
+}
+
+.real_time_information__Weather h2, p{
+    text-align: center;
+    margin: 0.5em;
+}
+
+.weatherdescription{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    vertical-align: middle;
+}
+
+.weatherimg{
+    margin: auto;
+    height: 3em;
+    width: 3em;
+}
+
+/*Upcoming Activities section*/
+
+.upcoming_activities{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    background-color: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    margin-top:  var(--top-margin);
+}
+
+.upcoming_activities__header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    max-height: 2em;
+    margin: 0.75em;
+    align-items: center;
+}
+
+.upcoming_activities__header img{
+    margin-left: 0.75em;
+    margin-right: 0.5em;
+    max-width: 20px;
+    max-height: 20px;
+}
+
+.activity_log{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin: 0em;
+    max-height: 339px;
+    overflow-y: scroll;
+}
+
+.activity_log::-webkit-scrollbar{
+    width: 0.4em;
+}
+
+.activity_log::-webkit-scrollbar-thumb{
+    border-radius: 0.3em;
+    box-shadow: inset 0 0 0.7em rgb(0, 0, 0);
+}
+
+.activities{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-left: 0.3em;
+    margin-right: 0.7em;
+    font-size: var(--activity-size);
+}
+
+.activity_log :last-child{
+    margin-bottom: 0.5em;
+}
+
+/*add activity and view map button*/
+.btn_group1{
+    display: flex;
+    flex-direction: column;
+}
+
+.btn_primary{
+    text-align: center;
+    background-color: var(--clr-background-accent);
+    margin-top: var(--top-margin);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    padding: 0.5em;
+}
+
+/*heathbuddy chatwindow*/
+
+.Healthbuddy{
+    border-radius: var(--border-radius);
+    height: 20em;
+    width: 15em;
+    position: absolute;
+    z-index: 1;
+    left: 20%;
+    top: 25%;
+}
+
+.Health_buddy_header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #1dce23;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: 0;
+}
+
+.health_buddy_logo{
+    margin: 0.5em;
+    margin-left: 0.3em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.2em;
+}
+
+.health_buddy_logo img{
+    max-width: 24px;
+    max-height: 24px;
+    border: solid 1px #000000;
+    border-radius: 50%;
+    background-color: #4caf50;
+}
+
+.health_buddy_logo h4{
+    margin: 0;
+    height: max-content;
+}
+
+.Close_Health_buddy{
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    cursor: pointer;
+    max-height: 30px;
+    margin: auto;
+    margin-right: 0.2em;
+}
+
+/*chat bot and claim rewards button*/
+.btn_group2{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    height: max-content;
+}
+
+.div_healthbuddy{
+    background-color: #4caf50;
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    margin-top: var(--top-margin);
+    width: 10em;
+    padding: auto;
+}
+
+.btn_healthbuddy{
+    border: none;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 0.3em;
+    cursor: pointer;
+    transition-duration: 0.3s;
+    border-radius: var(--border-radius);
+}
+
+.btn_healthbuddy:hover{
+    background-color: #1dce23;
+}
+
+.btn_healthbuddy img{
+    align-self: center;
+    margin: 0;
+}
+
+.btn_healthbuddy p{
+    color: white;
+    align-self: center;
+    margin: 0;
+    font-size: calc(var(--activity-size) + 0.31em);
+}
+
+.btn_reward{
+    background-color: var(--clr-background-accent);
+    border-radius: var(--border-radius);
+    border: var(--border-color);
+    margin-top: var(--top-margin);
+    width: 10em;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.3em;
+}
+
+.btn_reward img{
+    max-width: 30px;
+    max-height: 30px;
+    align-self: center;
+    margin: 0;
+}
+
+.btn_reward p{
+    align-self: center;
+    margin: 0;
+    font-size: var(--activity-size);
+}
+
+/*Adjust UI for screen size <= 410px*/
+
+@media (width <= 410px){
+
+    .main_main{
+        min-height: max-content;
+    }
+    .user_points{
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .real_time_information{
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .real_time_information__UV{
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        max-width: 100%;
+    }
+
+    .real_time_information__Weather{
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        max-width: 100%;
+        margin-top: var(--top-margin);
+    }
+
+    .real_time_information .Information{
+        font-size: 2em;
+        margin-top: 0;
+    }
+
+    .real_time_information p{
+        margin-top: 0;
+    }
+
+    .Healthbuddy{
+        left: 12%;
+        top: 20%
+    }
+
+    .btn_group2{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        margin-bottom: 0.5em;
+    }
+
+    .div_healthbuddy{
+        width: auto;
+    }
+
+    .btn_reward{
+        width: auto;
+    }
+}
+
+@media (width <= 398px){
+    .Healthbuddy{
+        left: 12%;
+        top: 36%
+    }
+}
+
+/*Adjust UI for screen size >= 410px*/
+
+@media (width >= 550px){
+    body{
+        margin: 0;
+    }
+
+    .main_grid{
+        display: grid;
+        grid-template-columns: 
+            minmax(1em,1fr)
+            repeat(4,minmax(5rem,30rem))
+            minmax(1em,1fr);
+        gap: 1em;
+    }
+
+    .header{
+        grid-column: 1/-1;
+    }
+
+    .main_main{
+        grid-column: 2 / 6;
+        display: grid;
+        grid-template-columns: subgrid;
+    }
+
+    .user_points{
+        grid-column: 1 / 3;
+        grid-row: 1;
+        justify-content: space-around;
+    }
+
+    .real_time_information{
+        grid-column: 1/ 3;        
+        max-width: 100%;
+        justify-content: space-around;
+        margin-bottom: 0.5em;
+        gap: 1em
+    }
+
+    .real_time_information__UV{
+        width: 100%;
+    }
+
+    .real_time_information__Weather{
+        width: 100%;
+    }
+    .weatherdescription{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        vertical-align: middle;
+        margin-right: 2.5em;
+    }
+
+    .weatherimg{
+        margin: 0;
+    }
+
+    .upcoming_activities{
+        grid-column: 3 / -1;
+        grid-row: 1 / 4;
+        margin-bottom: 0.5em;
+    }
+
+    .upcoming_activities__header{
+        max-height: 5em;
+    }
+
+    .btn_group1{
+        grid-column: 3 / -1;
+        grid-row: 5;
+        margin-bottom: 1em;
+    }
+
+    .btn_group2{
+        grid-column: 1 / 3;
+        grid-row: 5;
+        margin-bottom: 1em;
+        max-width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        height: auto;
+        gap: 1em;
+    }
+
+    .div_healthbuddy{
+        width: 20em;
+    }
+
+    .btn_reward{
+        width: 20em;
+    }
+
+}

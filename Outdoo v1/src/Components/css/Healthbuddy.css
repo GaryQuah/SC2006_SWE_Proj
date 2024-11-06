@@ -1,0 +1,80 @@
+:root{
+    --clr-text: #000000;
+
+    --ff-sansserif: sans-serif;
+    --ff-logo: sans-serif;
+
+    --border-radius: 1em;
+    --bg-color: rgba(255, 255, 255, 0.659);
+    --border-color: black 3px solid;
+    --min-realtime-size: 6rem;
+    --max-realtime-size: 10rem;
+    --top-margin: 1em;
+    --inf-size: 1.75em;
+    --activity-size: 1.25em;
+}
+
+.health_buddy{
+    height: 100%;
+    padding: 0.3em;
+    padding-top: 0.5em;
+    background-color: #fff;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.health_buddy_Chatwindow{
+    height: 87%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 0.5em;
+    gap: 0.5em;
+}
+
+.health_buddy_Chatwindow::-webkit-scrollbar{
+    width: 0.2em;
+}
+
+.health_buddy_Chatwindow::-webkit-scrollbar-thumb{
+    border-radius: 0.3em;
+    box-shadow: inset 0 0 0.7em rgb(0, 0, 0);
+}
+
+.health_buddy_Chatwindow .user{
+    background: rgb(228, 227, 227);
+    padding: 0.5em;
+    border: solid 1px rgb(201, 200, 200);
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    border-radius: 0.3em;
+    margin-left: 15%;
+    font-size: 0.88em;
+}
+
+.health_buddy_Chatwindow .bot{
+    background: rgb(27, 255, 2);
+    padding: 0.5em;
+    border: solid 1px rgb(201, 200, 200);
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    border-radius: 0.3em;
+    margin-right: 15%;
+    font-size: 0.88em;
+}
+
+.chatbot_input{
+    width: 100%;
+    padding-top: 0.2em;
+    box-sizing: border-box;
+    border-top: 1px solid #ccc;
+}
+
+.chatbot_input input{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: none;
+    font-size: 0.88em;
+}
+
+.chatbot_input input:focus{
+    outline-width: 0;
+}
