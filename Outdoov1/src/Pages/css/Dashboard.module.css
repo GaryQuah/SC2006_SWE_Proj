@@ -402,7 +402,55 @@ img{
     font-size: var(--activity-size);
 }
 
-/*Adjust UI for screen size <= 410px*/
+/* Notification Overlay Styles */
+
+.notificationOverlay {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 250px;
+    background-color: #4caf50;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.notificationOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.notificationOverlay h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.notificationOverlay p {
+    margin: 5px 0 0;
+}
+
+.closeNotification {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.closeNotification:hover {
+    color: #d7d7d7;
+}
+
+/* Responsive Adjustments */
 
 @media (width <= 410px){
 
@@ -472,7 +520,7 @@ img{
     }
 }
 
-/*Adjust UI for screen size >= 410px*/
+/*Adjust UI for screen size >= 550px*/
 
 @media (width >= 550px){
     body{
@@ -565,5 +613,4 @@ img{
     .btn_reward{
         width: 20em;
     }
-
 }

@@ -15,6 +15,27 @@ from flask_jwt_extended import jwt_required
 views = Blueprint('views', __name__)
 auth = Blueprint('auth', __name__)
 
+def update_user_points(user, points_to_add):
+    user_points = Points.query.filter_by(user_id=user.id).first()
+    if user_points:
+        user_points.point += points_to_add
+    else:
+        # If the user doesn't have a points entry, create one
+        user_points = Points(user_id=user.id, point=points_to_add)
+        db.session.add(user_points)
+    db.session.commit()
+    return user_points.point  # Return the updated points
+
+@views.route('/update_points', methods=['POST'])
+@jwt_required()
+def update_points():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    points_to_add = request.json.get("points", 0)
+    updated_points = update_user_points(user, points_to_add)
+    return jsonify({"updatedPoints": updated_points})
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -26,23 +47,31 @@ def login():
             if not email or not password:
                 return jsonify({'message': "Email and password are required."}), 400
 
-            print("email = ", email)
-            print("password = ", password)
             user = User.query.filter_by(email=email).first()
             if user:
                 if check_password_hash(user.password, password):
                     access_token = create_access_token(identity=email)
-                    print("access token: ", access_token)
-                    return jsonify({"email": email, "token": access_token}), 200
+                    # Add 100 points for logging in
+                    updated_points = update_user_points(user, 100)
+                    return jsonify({"email": email, "token": access_token, "points": updated_points}), 200
                 else:
                     return jsonify({'message': "Wrong Credentials"}), 401
             else:
                 return jsonify({'message': "Email does not exist"}), 401
         except Exception as e:
-            print("Error occurred:", e)  # Log the error for debugging
+            print("Error occurred:", e)
             return jsonify({"error": "An unexpected error occurred."}), 500
         
     return jsonify({"message": "Method not allowed. Use POST to log in."}), 405
+
+@views.route('/increment-point', methods=['POST'])
+@jwt_required()
+def increment_point():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    updated_points = update_user_points(user, 1)  # Increment by 1 point
+    return jsonify({"points": updated_points})
+
 
 @auth.route('/logout')
 @jwt_required
@@ -151,30 +180,25 @@ def dashboard():
 @views.route('/addactivity', methods=['GET', 'POST'])
 @jwt_required()
 def addactivity():
-    _, description, temperature = get_weather()
-    uv_index = get_uv_index()
-    chatbot_response = None
-    Activities = []
-    location = "null"
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+
     if request.method == 'POST':
         data = request.get_json()
-        print(data)
         activity = data.get('addactivity_activity')
         location = data.get('addactivity_location')
-        print("activity after get:", activity)
-        print("location after get:", location)
         ActivitiesList.append(activity)
-        prompt =  f"From the list={ActivitiesList}, can you return me a list of activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Activities = []"
-        #chatbot_response = get_response(prompt)
-        #print(chatbot_response)
-        chatbot_response = ("Activities = ['Indoor Cycling', 'Jump Rope', 'Aerobics', 'Basketball', 'Badminton', 'Table Tennis', 'Dance', 'Gym', 'Pilates']")
-        Activities = ast.literal_eval(chatbot_response.split('=')[1].strip())
-        print(Activities)
-        print(location)
 
-        return jsonify({"activities" : Activities, "location" : location})
+        # Add 100 points for planning an activity
+        updated_points = update_user_points(user, 100)
         
-    return jsonify({"activities" : Activities, "location" : location})
+        # Here goes the chatbot response code or any other processing
+        Activities = ["Indoor Cycling", "Jump Rope", "Aerobics", "Basketball", "Badminton", "Table Tennis", "Dance", "Gym", "Pilates"]
+
+        return jsonify({"activities": Activities, "location": location, "points": updated_points})
+
+    return jsonify({"activities": [], "location": "null"})
+
 
 @views.route('/sendactivity', methods=['GET', 'POST'])
 @jwt_required()

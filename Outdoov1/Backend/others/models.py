@@ -27,14 +27,14 @@ class Location(db.Model):
 
 class Points(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    point = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    point = db.Column(db.Integer, default=0)  # Set default to 0
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)  # Ensure only one entry per user
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
-    notes = db.relationship('Note')
-    activity = db.relationship('Activity')
-    points = db.relationship('Points')
+    notes = db.relationship('Note', backref='user', lazy=True)
+    activities = db.relationship('Activity', backref='user', lazy=True)
+    points = db.relationship('Points', uselist=False, backref='user')  # One-to-one relationship
