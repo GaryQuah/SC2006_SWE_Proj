@@ -148,10 +148,28 @@ img{
 .button2:hover {
     background-color: #45a049; /* Darker grey on hover */
     transform: scale(1.05); /* Slightly enlarge button on hover */
+}/* General button styles */
+.fetchbutton {
+    width: 100%;
+    background-color: rgb(26, 66, 34); /* Use theme color */
+    border: none; /* No border */
+    color: white; /* White text */
+    padding: 10px 15px; /* Padding for buttons */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* Remove underline */
+    display: inline-block; /* Block-level button */
+    font-size: 1em; /* Button font size */
+    border-radius: var(--border-radius); /* Rounded corners */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+}
+
+.fetchbutton:hover {
+    background-color: #45a049; /* Darker grey on hover */
+    transform: scale(1.05); /* Slightly enlarge button on hover */
 }
 
 /* General button styles */
-.button3 {
+.resetbutton {
     width:50%;
     background-color: grey; /* Use theme color */
     border: none; /* No border */
@@ -165,12 +183,28 @@ img{
     transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
 }
 
-.button3:hover {
+.resetbutton:hover {
     background-color: #4e4f4e; /* Darker grey on hover */
     transform: scale(1.05); /* Slightly enlarge button on hover */
 }
 
-
+.addActivityButton {
+    background-color: #4CAF50; /* Choose a color you like */
+    color: white;
+    border: none;
+    padding: 10px 20px; /* Adjust padding for a rounder look */
+    border-radius: 20px; /* Make the button rounder */
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 auto; /* Center button horizontally */
+    margin-bottom: 1em; /* Add some space above the button */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+  }
+  
+  .addActivityButton:hover {
+    background-color: #45a049; /* Slightly darker shade on hover */
+  }
+  
 
 
 
