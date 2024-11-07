@@ -759,6 +759,7 @@ const fetchWeatherDataEnd = async () => {
               ))}
 
             </select>
+           <button className={mapstyle.addActivityButton} onClick={resetMap}>Add Activity +</button> 
           <button className={mapstyle.button2} onClick={handleFetchParks}>Fetch Parks</button>
           <button className={mapstyle.button2}  onClick={handleFetchCommunityCenters}>Fetch Community Centers</button> {/* New button */}
           <button className={mapstyle.button3} onClick={resetMap}>Reset Map</button>
