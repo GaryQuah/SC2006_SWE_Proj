@@ -58,7 +58,7 @@ const containerStyle = {
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
 
-/*
+
 const ActivitiesList = [
   "Yoga",
   "Pilates",
@@ -98,7 +98,7 @@ const ActivitiesList = [
   "Trail Running",
   "Frisbee",
   "Kite Flying",
-];*/
+];
 
 
 export function MapFunctions() {  
@@ -150,21 +150,21 @@ export function MapFunctions() {
   const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
   //Fetch activity data from get activity page
-  const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
+  //const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
   const Activities_API_URL = 'http://127.0.0.1:5000/addactivity';
   const SendActivities_API_URL = 'http://127.0.0.1:5000/sendactivity';
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const addactivity_activity = localStorage.getItem('formdataactivity')
   const addactivity_location = localStorage.getItem('formdatalocation')
-
+  const [activityTime, setActivityTime] = useState<string>("");
 
   const fetchActivities = async () => {
     console.log("map key = " + "Bearer " + token)
     axios.post(Activities_API_URL, {addactivity_activity,addactivity_location},{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       console.log("response: "+ response.data.activities + response.data.location)
-      setActivitiesList(response.data.activities)
+      //setActivitiesList(response.data.activities)
       setPostalCode(response.data.location)
     })
     .catch(error => {
@@ -179,7 +179,7 @@ export function MapFunctions() {
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
     
-    axios.post(SendActivities_API_URL, {/*data to send here*/} ,{headers:{ Authorization : "Bearer " + token}})
+    axios.post(SendActivities_API_URL, {/*data to send here*/activityLocations, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       navigate("/dashboard")
     })
@@ -701,14 +701,14 @@ const fetchWeatherDataEnd = async () => {
             ))}
 
              {/* InfoWindow for selected Activity location */}
-             {selectedCommunityCenter && (
+             {selectedActivityLocations && (
               <InfoWindow
-                position={selectedCommunityCenter.geometry.location}
+                position={selectedActivityLocations.geometry.location}
                 onCloseClick={() => setSelectedActivityLocations(null)}
               >
                 <div>
-                  <h4>{selectedCommunityCenter.name}</h4>
-                  <p>{selectedCommunityCenter.vicinity}</p>
+                  <h4>{selectedActivityLocations.name}</h4>
+                  <p>{selectedActivityLocations.vicinity}</p>
                 </div>
               </InfoWindow>
             )}
@@ -759,7 +759,7 @@ const fetchWeatherDataEnd = async () => {
               ))}
 
             </select>
-           <button className={mapstyle.addActivityButton} onClick={resetMap}>Add Activity +</button> 
+           <button className={mapstyle.addActivityButton} onClick={sendActivities}>Add Activity +</button> 
           <button className={mapstyle.button2} onClick={handleFetchParks}>Fetch Parks</button>
           <button className={mapstyle.button2}  onClick={handleFetchCommunityCenters}>Fetch Community Centers</button> {/* New button */}
           <button className={mapstyle.button3} onClick={resetMap}>Reset Map</button>
