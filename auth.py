@@ -16,9 +16,11 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if check_password_hash(user.password, password):
-                flash('Logged in successfully!', category = 'success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+                otp = otp_validation(email)
+                session['otp'] = otp
+                session['temp_user_id'] = user.id
+                flash('OTP sent to your email. Please verify.', category='info')
+                return redirect(url_for('auth.verify_otp'))
             else:
                 flash('Incorrect password, try again.', category = 'error')
         else:
@@ -52,16 +54,6 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            otp = otp_validation(email)
-            session['temp_user_data'] = {
-                "email": email,
-                "first_name": first_name,
-                "password": generate_password_hash(password1, method='pbkdf2:sha256')
-            }
-            session['otp'] = otp
-            flash('OTP sent to your email. Please verify.', category='info')
-            return redirect(url_for('auth.verify_otp'))
-        
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(new_user)
             db.session.commit()
@@ -76,24 +68,19 @@ def verify_otp():
     if request.method == 'POST':
         entered_otp = request.form.get('otp')
         saved_otp = session.get('otp')
-        
-        if entered_otp == saved_otp:
-            user_data = session.pop('temp_user_data', None)
+        user_id = session.get('temp_user_id')
+
+        if entered_otp == saved_otp and user_id:
+            user = User.query.get(user_id)
             session.pop('otp', None)
-            if user_data:
-                new_user = User(
-                    email=user_data['email'],
-                    first_name=user_data['first_name'],
-                    password=user_data['password']
-                )
-                db.session.add(new_user)
-                db.session.commit()
-                login_user(new_user, remember=True)
-                flash('Account created successfully!', category='success')
+            session.pop('temp_user_id', None)
+            if user:
+                login_user(user, remember=True)
+                flash('Logged in successfully!', category='success')
                 return redirect(url_for('views.home'))
             else:
-                flash('Error creating account. Please try again.', category='error')
-                return redirect(url_for('auth.sign_up'))
+                flash('Error logging in. Please try again.', category='error')
+                return redirect(url_for('auth.login'))
         else:
             flash('Invalid OTP. Please try again.', category='error')
 
