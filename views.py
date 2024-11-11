@@ -7,28 +7,63 @@ from .api_handler import get_weather, get_uv_index
 from .static.activitylist import ActivitiesList
 from .chatbot import get_response
 import ast
+from datetime import datetime
 
 views = Blueprint('views', __name__)
 
-def update_json_file(user_id, description, temperature, uv_index, uv_description):
+def num_to_time(num):
+    num = int(num)
+    if num == -1:
+        return datetime.now().strftime('%I:%M %p')
+    hours = num // 2
+    minutes = (num % 2) * 30
+    time = datetime.strptime(f"{hours:02}:{minutes:02}", "%H:%M")
+    return time.strftime("%I:%M %p")
+
+@views.route('/dashboard', methods=['GET'])
+@login_required
+def dashboard():
+    user_id = current_user.id 
     user_activities = Activity.query.filter_by(user_id=user_id).all()
     user_points = Points.query.filter_by(user_id=user_id).first()
 
-    activities_list = [activity.activityName for activity in user_activities]
+    activities_list = []
+    for activity in user_activities:
+        activity_data = {
+            "activityName": activity.activityName,
+            "start_time": num_to_time(activity.time.start_time) if activity.time else None
+        }
+        activities_list.append(activity_data)
     points = user_points.point if user_points else 0
+    
+    # Fetch weather and UV details
+    _, description, temperature = get_weather()
+    uv_index = get_uv_index()
+    
+    # Generate UV description based on uv_index
+    if uv_index <= 2:
+        uv_description = "Low: You’re good to go! Enjoy the outdoors, but pop on some sunglasses and a little SPF 15+ if you have sensitive skin. Have fun!"
+    elif uv_index in {3, 4, 5}:
+        uv_description = "Moderate: It’s a warm day! Wear a hat, sunglasses, and don’t forget your SPF 30+. Find some shade during midday to stay cool and protected."
+    elif uv_index in {6, 7}:
+        uv_description = "High: Sun’s getting strong! Grab your sunscreen (SPF 30+), a wide-brimmed hat, and some light clothing to keep your skin safe. Shade is your friend!"
+    elif uv_index in {8, 9, 10}:
+        uv_description = "Very High: The sun means business! You’ll need full protection: SPF 30+, a hat, and long sleeves. Stay in the shade when possible to beat the heat."
+    elif uv_index >= 11:
+        uv_description = "Extreme: Whoa, it's intense out there! Cover up with SPF 30+, wear a hat, long sleeves, and try to stay indoors or in the shade to avoid serious sunburn."
 
-    FEdata_dict = {
+    # Structure data for JSON response
+    data = {
         "weather_description": description,
         "temperature": temperature,
         "uv_index": uv_index,
-        "uv_description": uv_description.replace('\n', '<br>'),
+        "uv_description": uv_description,
         "activities": activities_list,
         "points": points
     }
 
-    # Write the dictionary to the JSON file
-    with open('FEdata.json', 'w') as json_file:
-        json.dump(FEdata_dict, json_file, indent=4)
+    # Send the data as JSON response
+    return jsonify(data)
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
@@ -61,7 +96,6 @@ def home():
                     user_points.point = points
                 db.session.commit()
                 flash('Points updated!', category='success')
-                update_json_file(current_user.id, description, temperature, uv_index, uv_description)
             else:
                 flash('Please enter valid points.', category='error')
         else:
@@ -87,19 +121,13 @@ def home():
                 flash('Activity added!', category='success')
             
                 ActivitiesList.append(activity)
-                prompt = f"From the list={ActivitiesList}, can you return me 2 lists of indoor and outdoor activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Indoor Activities = [] Outdoor Activities = []"
+                prompt = f"From the list={ActivitiesList}, can you return me a list of activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Activities = []"
 
                 #chatbot_response = get_response(prompt)
                 #print(chatbot_response)
-                chatbot_response = "Indoor Activities = ['Yoga', 'Pilates', 'Gym', 'Spinning', 'Bowling', 'Table Tennis', 'Squash', 'Bouldering', 'Dance', 'Gymnastics', 'Zumba', 'Indoor Cycling', 'Jump Rope', 'Kickboxing', 'Aerobics', 'Handball', 'Basketball', 'Badminton'] Outdoor Activities = ['Running', 'Cycling', 'Hiking', 'Volleyball', 'Kayaking', 'Skating', 'Dragon Boating', 'Outdoor Yoga', 'Soccer', 'Tennis', 'Fishing', 'Basketball', 'Archery', 'Windsurfing', 'Trail Running', 'Frisbee', 'Kite Flying', 'Diving']"
-                indoor_part, outdoor_part = chatbot_response.split('Outdoor Activities = ')
-                indoor_activities = ast.literal_eval(indoor_part.replace('Indoor Activities = ', ''))
-                outdoor_activities = ast.literal_eval(outdoor_part)
-
-                print("Indoor Activities:", indoor_activities)
-                print("Outdoor Activities:", outdoor_activities)
-
-                update_json_file(current_user.id, description, temperature, uv_index, uv_description)
+                chatbot_response = ("Activities = ['Indoor Cycling', 'Jump Rope', 'Aerobics', 'Basketball', 'Badminton', 'Table Tennis', 'Dance', 'Gym', 'Pilates']")
+                Activities = ast.literal_eval(chatbot_response.split('=')[1].strip())
+                print(Activities)
 
     return render_template(
         "home.html", 
@@ -125,6 +153,5 @@ def delete_activity():
             _, description, temperature = get_weather()
             uv_index = get_uv_index()
             uv_description = ""
-            update_json_file(current_user.id, description, temperature, uv_index, uv_description)
     
     return jsonify({})

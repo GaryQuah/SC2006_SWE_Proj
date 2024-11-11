@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User, Note
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import login_user, login_required, logout_user, current_user
+from .otp_validator import otp_validation
 
 auth = Blueprint('auth', __name__)
 
@@ -51,6 +52,16 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
+            otp = otp_validation(email)
+            session['temp_user_data'] = {
+                "email": email,
+                "first_name": first_name,
+                "password": generate_password_hash(password1, method='pbkdf2:sha256')
+            }
+            session['otp'] = otp
+            flash('OTP sent to your email. Please verify.', category='info')
+            return redirect(url_for('auth.verify_otp'))
+        
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(new_user)
             db.session.commit()
@@ -58,5 +69,59 @@ def sign_up():
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 
-
     return render_template("sign_up.html", user=current_user)
+
+@auth.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    if request.method == 'POST':
+        entered_otp = request.form.get('otp')
+        saved_otp = session.get('otp')
+        
+        if entered_otp == saved_otp:
+            user_data = session.pop('temp_user_data', None)
+            session.pop('otp', None)
+            if user_data:
+                new_user = User(
+                    email=user_data['email'],
+                    first_name=user_data['first_name'],
+                    password=user_data['password']
+                )
+                db.session.add(new_user)
+                db.session.commit()
+                login_user(new_user, remember=True)
+                flash('Account created successfully!', category='success')
+                return redirect(url_for('views.home'))
+            else:
+                flash('Error creating account. Please try again.', category='error')
+                return redirect(url_for('auth.sign_up'))
+        else:
+            flash('Invalid OTP. Please try again.', category='error')
+
+    return render_template("verify_otp.html")
+
+@auth.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password1 = request.form.get('new_password1')
+        new_password2 = request.form.get('new_password2')
+
+        # Check if the current password is correct
+        if not check_password_hash(current_user.password, current_password):
+            flash('Current password is incorrect.', category='error')
+            return redirect(url_for('auth.change_password'))
+
+        # Validate the new password
+        if new_password1 != new_password2:
+            flash('New passwords do not match.', category='error')
+        elif len(new_password1) < 7:
+            flash('New password must be at least 7 characters.', category='error')
+        else:
+            # Update the password in the database
+            current_user.password = generate_password_hash(new_password1, method='pbkdf2:sha256')
+            db.session.commit()
+            flash('Password updated successfully!', category='success')
+            return redirect(url_for('views.home'))
+
+    return render_template("change_password.html", user=current_user)
