@@ -55,8 +55,24 @@ input{
     margin: 0;
 }
 
-label{
-    margin: 0;
+.login_back{
+    margin-top: 0;
+    margin-bottom: 0;
+    height: 3em;
+    width: 5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0.5em;
+    font-size: 1em;
+    transition: 0.3s ease;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+}
+
+.login_back:hover{
+    cursor: pointer;
+    transform: scale(1.1);    
 }
 
 .login_div{
@@ -74,7 +90,7 @@ label{
 .header{
     display: flex;
     justify-content: center;
-    margin: 2em;
+    margin: 0em;
     gap: 0.5em;
 }
 
@@ -87,7 +103,7 @@ label{
     margin-top: 0;
     margin-bottom: 0;
     height: 3em;
-    width: 80%;
+    width: 60%;
     margin-left: auto;
     margin-right: auto;
     border-radius: 0.5em;
@@ -97,23 +113,6 @@ label{
 }
 
 .login_submit:hover{
-    cursor: pointer;
-    transform: scale(1.1);
-    background-color: #33ff00;
-}
-
-.login_signup{
-    margin-top: 0;
-    border: none;
-    background: none;
-    font-size: 1em;
-    text-decoration: underline;
-    color: blue;
-    width: 100%;
-    transition: 0.1s;
-}
-
-.login_signup:hover{
     cursor: pointer;
     transform: scale(1.1);
 }

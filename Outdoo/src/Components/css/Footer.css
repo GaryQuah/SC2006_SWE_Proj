@@ -1,5 +1,10 @@
 footer{
-    margin-top: 0.5em;
+    background-color: rgba(255,255,255,0.7);
+    position: relative;
+    height: 3.5em;
+    margin-top: 2em;
+    clear: both;
+    align-content: center;
 }
 
 .nav{
@@ -17,4 +22,9 @@ footer{
 
 .nav li{
     list-style: none;
+    transition: 0.2s;
+}
+
+li:hover{
+    transform: scale(1.2);
 }

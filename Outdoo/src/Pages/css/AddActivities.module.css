@@ -51,6 +51,8 @@ h2{
     box-shadow: 0px 3px 4px -4px #000000;
     align-items: center;
     margin-bottom: 0;
+    background: rgb(12,203,62);
+    background: linear-gradient(90deg, rgba(12,203,62,1) 0%, rgba(10,228,222,1) 66%, rgba(12,182,187,1) 100%);
 }
 
 .menu_logo{
@@ -58,6 +60,7 @@ h2{
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
+    margin-left: 3.8em;
 }
 
 .menu_button{
@@ -86,9 +89,23 @@ h2{
     font-size: 1.1em;
 }
 
+.logout{
+    margin: 0;
+    margin-right: 0.7em;
+    background-color: rgb(212, 67, 67);
+    border: var(--border-color);
+    padding: 0.7em;
+    border-radius: var(--border-radius);
+    transition: 0.3s;
+}
+
+.logout:hover{
+    transform: scale(1.1);
+    background-color: red;
+}
+
 .profile{
-    margin-top: 1em;
-    margin-right: 0.3em;
+    margin-left: 0.3em;
 }
 
 /*Main section*/
@@ -185,7 +202,7 @@ form{
     font-weight: bold;
 }
 
-.location_select{
+.location_input input{
     width: 100%;
     border: 1px solid #999999;
     border-radius: var(--border-radius); 

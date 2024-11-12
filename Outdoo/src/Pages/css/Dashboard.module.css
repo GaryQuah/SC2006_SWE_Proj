@@ -85,6 +85,8 @@ img{
     box-shadow: 0px 3px 4px -4px #000000;
     align-items: center;
     margin-bottom: 0;
+    background: rgba(12,203,62);
+    background: linear-gradient(90deg, rgba(12,203,62,0.8) 0%, rgba(10,228,222,0.8) 66%, rgba(12,182,187,0.8) 100%);
 }
 
 img{
@@ -97,6 +99,7 @@ img{
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
+    margin-left: 3.8em;
 }
 
 .menu_button{
@@ -125,9 +128,23 @@ img{
     font-size: 1.1em;
 }
 
+.logout{
+    margin: 0;
+    margin-right: 0.7em;
+    background-color: rgb(212, 67, 67);
+    border: var(--border-color);
+    padding: 0.7em;
+    border-radius: var(--border-radius);
+    transition: 0.3s;
+}
+
+.logout:hover{
+    transform: scale(1.1);
+    background-color: red;
+}
+
 .profile{
-    margin-top: 1em;
-    margin-right: 0.3em;
+    margin-left: 0.7em;
 }
 
 /*User's point section*/
@@ -232,7 +249,7 @@ img{
     flex-direction: column;
     flex-wrap: nowrap;
     margin: 0em;
-    max-height: 339px;
+    max-height: 100%;
     overflow-y: scroll;
 }
 
@@ -246,13 +263,28 @@ img{
 }
 
 .activities{
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2,35%) 20% 10%;
     margin-left: 0.3em;
     margin-right: 0.7em;
     font-size: var(--activity-size);
+}
+.activities p{
+    justify-self: left;
+}
+
+.activities button{
+    background: none;
+    color: red;
+    border: none;
+    font-size: larger;
+    font-weight: bolder;
+}
+
+.activities button:hover{
+    cursor: pointer;
+    background: grey;
+    border-radius: 5em;
 }
 
 .activity_log :last-child{
@@ -272,6 +304,12 @@ img{
     border-radius: var(--border-radius);
     border: var(--border-color);
     padding: 0.5em;
+    transition: 0.3s;
+}
+
+.btn_primary:hover{
+    background-color: #c0eeb4;
+    transform: scale(1.05);
 }
 
 /*heathbuddy chatwindow*/
@@ -337,10 +375,9 @@ img{
 }
 
 .div_healthbuddy{
-    background-color: #4caf50;
-    border-radius: var(--border-radius);
-    border: var(--border-color);
+    background-color: #4a954d;
     margin-top: var(--top-margin);
+    border-radius: var(--border-radius);
     width: 10em;
     padding: auto;
 }
@@ -348,6 +385,8 @@ img{
 .btn_healthbuddy{
     border: none;
     background-color: transparent;
+    border-radius: var(--border-radius);
+    border: var(--border-color);
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -362,6 +401,7 @@ img{
 
 .btn_healthbuddy:hover{
     background-color: #1dce23;
+    transform: scale(1.1);
 }
 
 .btn_healthbuddy img{
@@ -387,6 +427,12 @@ img{
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.3em;
+    transition: 0.3s;
+}
+
+.btn_reward:hover{
+    background-color: #ecd9d9;
+    transform: scale(1.1);
 }
 
 .btn_reward img{
@@ -402,6 +448,54 @@ img{
     font-size: var(--activity-size);
 }
 
+/* Notification Overlay Styles */
+
+.notificationOverlay {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 250px;
+    background-color: #4caf50;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.notificationOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.notificationOverlay h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.notificationOverlay p {
+    margin: 5px 0 0;
+}
+
+.closeNotification {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.closeNotification:hover {
+    color: #d7d7d7;
+}
+
 /*Adjust UI for screen size <= 410px*/
 
 @media (width <= 410px){
@@ -409,6 +503,20 @@ img{
     .main_main{
         min-height: max-content;
     }
+
+    .menu_logo{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-left: 2em;
+    }
+
+    .logout{
+        margin-right: 0.3em;
+        font-size: smaller;
+    }
+
     .user_points{
         display: flex;
         flex-direction: column;
