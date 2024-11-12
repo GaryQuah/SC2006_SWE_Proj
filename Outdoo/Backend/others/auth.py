@@ -11,6 +11,7 @@ import ast
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+from datetime import datetime
 
 views = Blueprint('views', __name__)
 auth = Blueprint('auth', __name__)
@@ -44,11 +45,12 @@ def login():
         
     return jsonify({"message": "Method not allowed. Use POST to log in."}), 405
 
-@auth.route('/logout')
+@auth.route('/logout', methods=['GET','POST'])
 @jwt_required
 def logout():
-    logout_user()
-    return redirect(url_for('auth.login'))
+    if request.method == 'POST':
+        return jsonify({"message":"Logged out"}),200
+    return jsonify({"message":"Null"}),402
 
 @auth.route('/sign-up', methods=['GET','POST'])
 def sign_up():
@@ -108,8 +110,10 @@ def dashboard():
     activities_list = []
     for activity in user_activities:
         activity_data = {
+            "activityID": activity.id,
             "activityName": activity.activityName,
-            "start_time": activity.time.start_time if activity.time else None
+            "activityTime": activity.time.start_time if activity.time else None,
+            "activityLocation": activity.location.location if activity.location else None
         }
         activities_list.append(activity_data)
     points = user_points.point if user_points else 0
@@ -148,6 +152,29 @@ def dashboard():
     
     return jsonify(data)
 
+@views.route('/updatepoints', methods=['GET', 'POST'])
+@jwt_required()
+def updatepoints():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    user_id = user.id 
+    user_points = Points.query.filter_by(user_id=user_id).first()
+    inipoints = user_points.point if user_points else 0
+    if request.method == 'POST':
+        data = request.get_json()
+        print(data)
+        points = data.get('points')
+        print(points)
+        if not user_points:
+            user_points = Points(point=points, user_id=user_id)
+            db.session.add(user_points)
+        else:
+            user_points.point = points
+        db.session.commit()
+        return jsonify({"points" : "points", "Message" : "Updated"}),200
+        
+    return jsonify({"points": inipoints})
+
 @views.route('/addactivity', methods=['GET', 'POST'])
 @jwt_required()
 def addactivity():
@@ -182,6 +209,29 @@ def sendactivity():
     if request.method == 'POST':
         data = request.get_json()
         print(data)
+        activity = data.get('selectedActivity')
+        activitytime = data.get('addactivity_time')
+        activitytime = num_to_time(activitytime)
+        activitylocation = data.get('postalCode')
+        print("activity data=", activity, activitytime, activitylocation)
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(email=current_user).first()
+        user_id = user.id 
+        print("data = ", data)
+        new_activity=Activity(activityName=activity, user_id=user_id)
+        db.session.add(new_activity)
+        db.session.commit()
+
+        new_location=Location(location=activitylocation, activity_id=new_activity.id)
+        db.session.add(new_location)
+        db.session.commit()
+
+        new_time=Time(start_time=activitytime, activity_id=new_activity.id)
+        db.session.add(new_time)
+        db.session.commit()
+        user_activities = Activity.query.filter_by(user_id=user_id).all()
+        print("data =", user_activities)
+
         return jsonify({"message" : "activity added"}), 200
         
     return jsonify({"Null"})
@@ -189,20 +239,26 @@ def sendactivity():
 @views.route('/delete-activity', methods=['POST'])
 @jwt_required()
 def delete_activity():
-    activity = json.loads(request.data)
-    activityId = activity['activityId']
+    data = request.get_json()
+    print(data)
+    activityId = data.get('activityID')
     activity = Activity.query.get(activityId)
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user).first()
     user_id = user.id
     
     if activity:
-        if activity.user_id == current_user.id:
+        if activity.user_id == user_id:
             db.session.delete(activity)
             db.session.commit()
-
-            _, description, temperature = get_weather()
-            uv_index = get_uv_index()
-            uv_description = ""
     
     return jsonify({})
+
+def num_to_time(num):
+    num = int(num)
+    if num == -1:
+        return datetime.now().strftime('%I:%M %p')
+    hours = num // 2
+    minutes = (num % 2) * 30
+    time = datetime.strptime(f"{hours:02}:{minutes:02}", "%H:%M")
+    return time.strftime("%I:%M %p")

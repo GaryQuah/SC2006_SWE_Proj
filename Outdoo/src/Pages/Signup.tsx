@@ -1,4 +1,4 @@
-import loginstyle from "./css/Login.module.css"
+import signupstyle from "./css/Signup.module.css"
 import Hearticon from "../assets/Heart icon.png"
 import axios from "axios";
 import { useState } from "react";
@@ -14,6 +14,10 @@ export function Signup(){
     const [processedData, setProcessedData] = useState<any>(null); // Adjust type as needed
     const signup_API_URL = 'http://127.0.0.1:5000/sign-up';
     const navigate = useNavigate();
+   
+    const Back=() =>{
+      navigate("/");
+    };
 
     const signUp = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -53,13 +57,14 @@ export function Signup(){
 
     return(
         <>
-            <main className={loginstyle.main_main}>
-                <div className={loginstyle.login_div}>
-                    <div className={loginstyle.header}>
+            <main className={signupstyle.main_main}>
+              <button className={signupstyle.login_back} onClick={Back}>Back</button>
+                <div className={signupstyle.login_div}>
+                    <div className={signupstyle.header}>
                         <img src={Hearticon}/>
                         <h2>Outdoo</h2>
                     </div>
-                    <form onSubmit={signUp} className={loginstyle.login_inputs}>
+                    <form onSubmit={signUp} className={signupstyle.login_inputs}>
                         <label htmlFor="email">Email:</label>
                         <input type="email" placeholder=" Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>  
                         <label htmlFor="email">Name:</label>
@@ -68,8 +73,9 @@ export function Signup(){
                         <input type="password" placeholder=" ********" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                         <label htmlFor="confirmpassword">Confirm Password:</label>
                         <input type="password" placeholder=" ********" value={confirmpassword} onChange={(e) => setConfirmPassword(e.target.value)}required/>
-                        <button type="submit" className={loginstyle.login_submit} disabled={loading}>{loading? 'Singing Up...':'Sign Up'}</button>
-                        {error && <p className={loginstyle.error}>{error}</p>} {/* Show error message if exists */}
+                        <button type="submit" className={signupstyle.login_submit} disabled={loading}>{loading? 'Singing Up...':'Sign Up'}</button>
+                  
+                        {error && <p className={signupstyle.error}>{error}</p>} {/* Show error message if exists */}
                     </form>
                 </div>
             </main>

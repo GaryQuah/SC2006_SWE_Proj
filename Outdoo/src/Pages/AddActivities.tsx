@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { Footer } from "../Components/Footer"
 import Healthbuddyicon from "../assets/Chatbot white Icon.png"
 import addactivitystyle from "./css/AddActivities.module.css"
 import Hikingicon from "../assets/Hiking icon.png"
@@ -11,6 +10,7 @@ import axios from "axios"
 export function AddActivities(){
     const navigate = useNavigate();
     const addactivity_API_URL = "http://127.0.0.1:5000/addactivity";
+    const LOGOUT_API_URL = 'http://127.0.0.1:5000/logout'
     const [showhealthbuddy, setShowHealthbuddy] = useState(false);
     const token = localStorage.getItem('token');
     
@@ -35,11 +35,13 @@ export function AddActivities(){
         console.log("token:" + token)
         localStorage.setItem('formdataactivity', formData.activity);
         localStorage.setItem('formdatalocation', formData.location);
+        localStorage.setItem('formdatatime', formData.timestart);
         const formdataactivity = localStorage.getItem('formdataactivity')
         const formdatalocation = localStorage.getItem('formdatalocation')
+        const formdatatime = localStorage.getItem('formdatatime')
         console.log(formdataactivity + "/" + formdatalocation)
 
-        axios.post(addactivity_API_URL, {formdataactivity, formdatalocation},  {headers:{ Authorization : "Bearer " + token}})
+        axios.post(addactivity_API_URL, {formdataactivity, formdatalocation, formdatatime},  {headers:{ Authorization : "Bearer " + token}})
         .then(response => {
             navigate("/map");
         })
@@ -48,23 +50,32 @@ export function AddActivities(){
         });
     };
     
+    const Logout = () =>{
+        localStorage.removeItem('token');
+        localStorage.removeItem('formdataactivity');
+        localStorage.removeItem('formdatalocation');
+        localStorage.removeItem('formdatatime')
+    };
 
     return (
         <>
             <div className={addactivitystyle.main_grid}>
                 <div className={addactivitystyle.header}>
-                    <div className={addactivitystyle.menu_logo}>
-                        <div>
-                            <NavLink to="/dashboard" className={addactivitystyle.logo}>
-                                <img src={Hikingicon}></img>
-                                <h4>Outdoo</h4>
-                            </NavLink>
-                        </div>
-                    </div>
                     <NavLink to="/profile" className={addactivitystyle.profile}>
                         <img src={Usericon}></img>
                     </NavLink>
-                </div>
+                        <div className={addactivitystyle.menu_logo}>                        
+                            <div>
+                                <NavLink to="/dashboard" className={addactivitystyle.logo}>
+                                    <img src={Hikingicon}></img>
+                                    <h3>Outdoo</h3>
+                                </NavLink>
+                            </div>
+                        </div>
+                        <NavLink to="/" className={addactivitystyle.profile} onClick={Logout}>
+                            <h3 className={addactivitystyle.logout}>Logout</h3>
+                        </NavLink>
+                    </div>
                 <main className={addactivitystyle.main_main}>
                     <h1 className={addactivitystyle.heading}>What would you like to do?</h1>
                     <form onSubmit={handleSubmit}>
@@ -227,7 +238,6 @@ export function AddActivities(){
                     </button>
                 </main>
             </div>
-            <Footer/>
         </>
     )
 }

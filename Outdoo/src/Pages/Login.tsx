@@ -19,11 +19,17 @@ export function Login(){
         console.log("Login successful", response.data);
         const token = response.data.token;
         localStorage.setItem('token', token);
+        localStorage.setItem('justLoggedIn', 'true');  // Set flag for first login
+        console.log(localStorage.getItem('justLoggedIn'))
         console.log(token)
         navigate("/dashboard");
     })
-    .catch(error => {
-        console.error("Login error:", error);
+    .catch(err => {
+        if(err.status === 401){
+            alert(err.response.data.message)
+        }
+
+      console.error("Error sending data:", err);
     });
     };
     
