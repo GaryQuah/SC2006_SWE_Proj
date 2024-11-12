@@ -146,8 +146,8 @@ export function MapFunctions() {
   const [_endpointUVData, setEndUVData] = useState<UvData | null>(null);
 
   //API Keys - Change when / where needed
-  const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
-  const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
+  //const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
+  //const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
 
   //Fetch activity data from get activity page
   //const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
@@ -166,6 +166,7 @@ export function MapFunctions() {
       console.log("response: "+ response.data.activities + response.data.location)
       //setActivitiesList(response.data.activities)
       setPostalCode(response.data.location)
+      //mapRef.current.setCenter(postalCode);
     })
     .catch(error => {
         if (error.response && error.response.status === 401) {
@@ -178,22 +179,31 @@ export function MapFunctions() {
  
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
+
+    const getLocationName = async (postalCode: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+          const geocoder = new window.google.maps.Geocoder();
+          geocoder.geocode({ address: postalCode }, (results, status) => {
+              if (status === "OK" && results && results.length > 0) {
+                  // Type assertion to string because we know the result will be a string
+                  resolve(results[0].formatted_address);
+              } else {
+                  reject(`Geocoding failed: ${status}`);
+              }
+          });
+      });
+  };
    
-    let  locationName = selectedActivityLocation?.name;
+    let  locationName =  selectedActivityLocation?.name + " " + selectedActivityLocation?.vicinity;
 
     if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
     {
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ address: postalCode }, (results, status) => {
-        if (status === "OK" && results && results.length > 0) {
-            locationName = results[0].formatted_address;
-        } else {
-          console.error(`Geocoding location failed: ${status}`);
-          alert(`Geocoding origin failed: ${status}`);
-        }
-      });
+        alert(`Geocoding postal: ${postalCode}`);
+        locationName = await getLocationName(postalCode);
+        alert(`Geocoded location: ${locationName}`);
     }
-    
+
+    alert(`sending address: ${locationName}`);
     //axios.post(SendActivities_API_URL, {/*data to send here*/locationName, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     //axios.post(SendActivities_API_URL, {/*data to send here*/postalCode, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     axios.post(SendActivities_API_URL, {/*data to send here*/locationName, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
@@ -309,7 +319,7 @@ const fetchWeatherDataEnd = async () => {
   };
 
   const handleActivityClick = (center: Place) => {
-    setSelectedCommunityCenter(center); // Set selected community center when clicked
+    setSelectedActivityLocations(center); // Set selected community center when clicked
   };
 
  
