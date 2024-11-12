@@ -175,11 +175,25 @@ export function MapFunctions() {
         }
     });
   };
-
+ 
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
+   
+    let  locationName = selectedActivityLocation?.name;
+
+    if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
+    {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: postalCode }, (results, status) => {
+        if (status === "OK" && results && results.length > 0) {
+            locationName = results[0].formatted_address;
+        } else {
+          console.error(`Geocoding location failed: ${status}`);
+          alert(`Geocoding origin failed: ${status}`);
+        }
+      });
+    }
     
-    const locationName = selectedActivityLocation?.name;
     axios.post(SendActivities_API_URL, {/*data to send here*/locationName, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       navigate("/dashboard")
@@ -196,11 +210,13 @@ export function MapFunctions() {
 
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
+    const keyword = activity;
+
     service.nearbySearch(
       {
         location: location,
         radius: 10000, // Search within 10 km
-        keyword: activity, // Use the selected activity as a keyword
+        keyword: keyword, // Use the selected activity as a keyword
       },
       (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
@@ -293,6 +309,8 @@ const fetchWeatherDataEnd = async () => {
   const handleActivityClick = (center: Place) => {
     setSelectedCommunityCenter(center); // Set selected community center when clicked
   };
+
+ 
 
   const generateRoute = () => {
     if (!postalCode || !distance) {
