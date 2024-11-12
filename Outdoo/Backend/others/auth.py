@@ -212,7 +212,7 @@ def sendactivity():
         activity = data.get('selectedActivity')
         activitytime = data.get('addactivity_time')
         activitytime = num_to_time(activitytime)
-        activitylocation = data.get('postalCode')
+        activitylocation = data.get('locationName')
         print("activity data=", activity, activitytime, activitylocation)
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
