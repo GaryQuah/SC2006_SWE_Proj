@@ -544,6 +544,13 @@ const fetchWeatherDataEnd = async () => {
     }
   };
 
+  const Logout = () =>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('formdataactivity');
+    localStorage.removeItem('formdatalocation');
+    localStorage.removeItem('formdatatime')
+  };
+
   useEffect(()=>{
     fetchActivities()
   },[])
@@ -551,19 +558,21 @@ const fetchWeatherDataEnd = async () => {
   return (
     <div>
       <div className={mapstyle.header}>
-                    <div className={mapstyle.menu_logo}>                        
-                        <div>
-                            <NavLink to="/dashboard" className={mapstyle.logo}>
-                                <img src={Hikingicon}></img>
-                                <h4>Outdoo</h4>
-                            </NavLink>
-                        </div>
-                  
-                    </div>
-                    <NavLink to="/" className={mapstyle.profile}>
-                        <img src={Usericon}></img>
-                    </NavLink>
-                </div>
+          <NavLink to="/profile" className={mapstyle.profile}>
+              <img src={Usericon}></img>
+          </NavLink>
+          <div className={mapstyle.menu_logo}>                        
+              <div>
+                  <NavLink to="/dashboard" className={mapstyle.logo}>
+                      <img src={Hikingicon}></img>
+                      <h3>Outdoo</h3>
+                  </NavLink>
+              </div>
+          </div>
+          <NavLink to="/" className={mapstyle.profile} onClick={Logout}>
+              <h3 className={mapstyle.logout}>Logout</h3>
+          </NavLink>
+      </div>
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
 
           <div className={mapstyle.labelContainer}>
