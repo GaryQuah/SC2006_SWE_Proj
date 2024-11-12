@@ -131,7 +131,7 @@ export function MapFunctions() {
   const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
   const [activityLocations, setActivityLocations] = useState<Place[]>([]);
   const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
-  const [selectedActivityLocations, setSelectedActivityLocations] = useState<Place | null>(null);
+  const [selectedActivityLocation, setSelectedActivityLocations] = useState<Place | null>(null);
 
   //Waypoints
   const [_originPointName, setOriginPointName] = useState<string>("");
@@ -179,7 +179,8 @@ export function MapFunctions() {
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
     
-    axios.post(SendActivities_API_URL, {/*data to send here*/activityLocations, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
+    const locationName = selectedActivityLocation?.name;
+    axios.post(SendActivities_API_URL, {/*data to send here*/locationName, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       navigate("/dashboard")
     })
@@ -547,7 +548,6 @@ const fetchWeatherDataEnd = async () => {
                 </div>
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
 
-
           <div className={mapstyle.labelContainer}>
           <label >Postal Code:</label>
           <input className={mapstyle.searchInput1}
@@ -701,14 +701,14 @@ const fetchWeatherDataEnd = async () => {
             ))}
 
              {/* InfoWindow for selected Activity location */}
-             {selectedActivityLocations && (
+             {selectedActivityLocation && (
               <InfoWindow
-                position={selectedActivityLocations.geometry.location}
+                position={selectedActivityLocation.geometry.location}
                 onCloseClick={() => setSelectedActivityLocations(null)}
               >
                 <div>
-                  <h4>{selectedActivityLocations.name}</h4>
-                  <p>{selectedActivityLocations.vicinity}</p>
+                  <h4>{selectedActivityLocation.name}</h4>
+                  <p>{selectedActivityLocation.vicinity}</p>
                 </div>
               </InfoWindow>
             )}
