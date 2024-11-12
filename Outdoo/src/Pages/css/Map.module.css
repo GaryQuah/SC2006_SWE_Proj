@@ -25,17 +25,18 @@ html{
 }
 
 /*Header section*/
+/*Header section*/
 .header{
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-    box-shadow: 0px 2px 3px -3px #000000;
+    box-shadow: 0px 3px 4px -4px #000000;
     align-items: center;
     margin-bottom: 0;
-    height: 6em;
+    background: rgba(12,203,62);
+    background: linear-gradient(90deg, rgba(12,203,62,0.8) 0%, rgba(10,228,222,0.8) 66%, rgba(12,182,187,0.8) 100%);
 }
-
 
 img{
     width: auto;
@@ -47,6 +48,13 @@ img{
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
+    margin-left: 3.8em;
+}
+
+.menu_button{
+    border: none;
+    background: none;
+    margin-top: 1em;
 }
 
 .logo{
@@ -58,25 +66,34 @@ img{
     padding-top: 0.5em;
     text-decoration: none;
     color: #000000;
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
-.logo:hover {
-    background-color: rgba(164, 192, 175, 0.7); /* Semi-transparent darker shade on hover */
-    border-radius: var(--border-radius); /* Consistent border-radius on hover */  }
-
 .logo img{
-    max-width: 1.75em;
-    max-height: 1.75em;
+    max-width: 1.5em;
+    max-height: 1.5em;
 }
 
 .logo h4{
-    font-size: 1.75em;
+    font-size: 1.1em;
+}
+
+.logout{
+    margin: 0;
+    margin-right: 0.7em;
+    background-color: rgb(212, 67, 67);
+    border: var(--border-color);
+    padding: 0.7em;
+    border-radius: var(--border-radius);
+    transition: 0.3s;
+}
+
+.logout:hover{
+    transform: scale(1.1);
+    background-color: red;
 }
 
 .profile{
-    margin-top: 0em;
-    margin-right: 0.3em;
+    margin-left: 0.7em;
 }
 
 
