@@ -112,7 +112,7 @@ def dashboard():
         activity_data = {
             "activityID": activity.id,
             "activityName": activity.activityName,
-            "activityTime": activity.time.start_time if activity.time else None,
+            "activityTime": num_to_time(activity.time.start_time) if activity.time else None,
             "activityLocation": activity.location.location if activity.location else None
         }
         activities_list.append(activity_data)
@@ -151,6 +151,51 @@ def dashboard():
     # Send the data as JSON response
     
     return jsonify(data)
+
+@views.route('/profile', methods=['GET'])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    profile_data = {
+        "email": user.email,
+        "name": user.first_name,
+        "password": user.password
+    }
+    return jsonify(profile_data)
+
+@auth.route('/change-password', methods=['POST'])
+@jwt_required()
+def change_password():
+    data = request.get_json()
+    print("Received data:", data)
+
+    current_password = data.get('currentPassword')
+    new_password = data.get('newPassword')
+    confirm_new_password = data.get('confirmNewPassword')
+    current_user_email = get_jwt_identity()
+    user = User.query.filter_by(email=current_user_email).first()
+
+    # Check if the current password is correct
+    if not check_password_hash(user.password, current_password):
+        print("Incorrect current password")
+        return jsonify({"message": "Incorrect current password"}), 400
+
+    # Validate the new password
+    if new_password != confirm_new_password:
+        print("New passwords do not match")
+        return jsonify({"message": "New passwords do not match"}), 400
+    elif len(new_password) < 6:
+        print("New password is too short")
+        return jsonify({"message": "New password is too short"}), 400
+
+    # Update the password in the database
+    user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    db.session.commit()
+
+    print("Password changed successfully")
+    return jsonify({"message": "Password changed successfully"}), 200
+
 
 @views.route('/updatepoints', methods=['GET', 'POST'])
 @jwt_required()
@@ -212,7 +257,7 @@ def sendactivity():
         activity = data.get('selectedActivity')
         activitytime = data.get('addactivity_time')
         activitytime = num_to_time(activitytime)
-        activitylocation = data.get('locationName')
+        activitylocation = data.get('postalCode')
         print("activity data=", activity, activitytime, activitylocation)
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
