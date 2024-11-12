@@ -161,7 +161,7 @@ export function MapFunctions() {
 
   const fetchActivities = async () => {
     console.log("map key = " + "Bearer " + token)
-    axios.post(Activities_API_URL, {addactivity_activity,addactivity_location,addactivity_time},{headers:{ Authorization : "Bearer " + token}})
+    axios.post(Activities_API_URL, {addactivity_activity,addactivity_location},{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       console.log("response: "+ response.data.activities + response.data.location)
       //setActivitiesList(response.data.activities)
@@ -195,7 +195,8 @@ export function MapFunctions() {
     }
     
     //axios.post(SendActivities_API_URL, {/*data to send here*/locationName, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
-    axios.post(SendActivities_API_URL, {/*data to send here*/postalCode, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
+    //axios.post(SendActivities_API_URL, {/*data to send here*/postalCode, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
+    axios.post(SendActivities_API_URL, {/*data to send here*/locationName, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       navigate("/dashboard")
     })
