@@ -131,7 +131,7 @@ export function MapFunctions() {
   const [selectedActivity, setSelectedActivity] = useState<string>("Yoga");
   const [activityLocations, setActivityLocations] = useState<Place[]>([]);
   const [showActivityMarkers, setShowActivityMarkers] = useState<boolean>(false);
-  const [selectedActivityLocations, setSelectedActivityLocations] = useState<Place | null>(null);
+  const [selectedActivityLocation, setSelectedActivityLocations] = useState<Place | null>(null);
 
   //Waypoints
   const [_originPointName, setOriginPointName] = useState<string>("");
@@ -161,7 +161,7 @@ export function MapFunctions() {
 
   const fetchActivities = async () => {
     console.log("map key = " + "Bearer " + token)
-    axios.post(Activities_API_URL, {addactivity_activity,addactivity_location,addactivity_time},{headers:{ Authorization : "Bearer " + token}})
+    axios.post(Activities_API_URL, {addactivity_activity,addactivity_location},{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       console.log("response: "+ response.data.activities + response.data.location)
       //setActivitiesList(response.data.activities)
@@ -175,11 +175,26 @@ export function MapFunctions() {
         }
     });
   };
-
+ 
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
+   
+    let  locationName = selectedActivityLocation?.name;
+
+    if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
+    {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: postalCode }, (results, status) => {
+        if (status === "OK" && results && results.length > 0) {
+            locationName = results[0].formatted_address;
+        } else {
+          console.error(`Geocoding location failed: ${status}`);
+          alert(`Geocoding origin failed: ${status}`);
+        }
+      });
+    }
     
-    axios.post(SendActivities_API_URL, {/*data to send here*/postalCode, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
+    axios.post(SendActivities_API_URL, {/*data to send here*/locationName, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     .then(response => {
       navigate("/dashboard")
     })
@@ -195,11 +210,13 @@ export function MapFunctions() {
 
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
+    const keyword = activity;
+
     service.nearbySearch(
       {
         location: location,
         radius: 10000, // Search within 10 km
-        keyword: activity, // Use the selected activity as a keyword
+        keyword: keyword, // Use the selected activity as a keyword
       },
       (results, status) => {
         if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
@@ -292,6 +309,8 @@ const fetchWeatherDataEnd = async () => {
   const handleActivityClick = (center: Place) => {
     setSelectedCommunityCenter(center); // Set selected community center when clicked
   };
+
+ 
 
   const generateRoute = () => {
     if (!postalCode || !distance) {
@@ -547,7 +566,6 @@ const fetchWeatherDataEnd = async () => {
                 </div>
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
 
-
           <div className={mapstyle.labelContainer}>
           <label >Postal Code:</label>
           <input className={mapstyle.searchInput1}
@@ -701,14 +719,14 @@ const fetchWeatherDataEnd = async () => {
             ))}
 
              {/* InfoWindow for selected Activity location */}
-             {selectedActivityLocations && (
+             {selectedActivityLocation && (
               <InfoWindow
-                position={selectedActivityLocations.geometry.location}
+                position={selectedActivityLocation.geometry.location}
                 onCloseClick={() => setSelectedActivityLocations(null)}
               >
                 <div>
-                  <h4>{selectedActivityLocations.name}</h4>
-                  <p>{selectedActivityLocations.vicinity}</p>
+                  <h4>{selectedActivityLocation.name}</h4>
+                  <p>{selectedActivityLocation.vicinity}</p>
                 </div>
               </InfoWindow>
             )}
