@@ -57,9 +57,10 @@ const containerStyle = {
 };
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
-const [postalCenter, setPostalCenter] = useState<LatLng>(center);
+//const [postalCenter, setPostalCenter] = useState<LatLng>(center);
+//const [postalCenter, setPostalCenter] = useState<LatLng>( { lat: 1.3521, lng: 103.8198 });
 
-const ActivitiesList = [
+/*const ActivitiesList = [
   "Yoga",
   "Pilates",
   "Gym",
@@ -99,7 +100,7 @@ const ActivitiesList = [
   "Frisbee",
   "Kite Flying",
 ];
-
+*/
 
 export function MapFunctions() {  
   //Values
@@ -150,7 +151,7 @@ export function MapFunctions() {
   const GMAPS_API_KEY = import.meta.env.VITE_GMAP_APIKEY; 
 
   //Fetch activity data from get activity page
-  //const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
+  const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]
   const Activities_API_URL = 'http://127.0.0.1:5000/addactivity';
   const SendActivities_API_URL = 'http://127.0.0.1:5000/sendactivity';
   const token = localStorage.getItem('token');
@@ -159,41 +160,44 @@ export function MapFunctions() {
   const addactivity_location = localStorage.getItem('formdatalocation')
   const addactivity_time = localStorage.getItem('formdatatime')
 
+  //
+  const [postalCenter, setPostalCenter] = useState<LatLng | null>(null);
+
   //Communicate with backend
   const fetchActivities = async () => {
-    console.log("map key = " + "Bearer " + token)
-    axios.post(Activities_API_URL, {addactivity_activity,addactivity_location},{headers:{ Authorization : "Bearer " + token}})
-    .then(response => {
-      console.log("response: "+ response.data.activities + response.data.location)
-      //setActivitiesList(response.data.activities)
-      setPostalCode(response.data.location)
-
-      const geocoder = new window.google.maps.Geocoder();
-    
-      geocoder.geocode({ address: postalCode }, (results, status) => {
-      if (status === "OK" && results && results.length > 0) {
-          const location = results[0].geometry.location;
-          setPostalCenter({
-            lat: location.lat(),
-            lng: location.lng(),
-          });
+    console.log("map key = " + "Bearer " + token);
+    axios.post(Activities_API_URL, { addactivity_activity, addactivity_location }, { headers: { Authorization: "Bearer " + token } })
+      .then(response => {
+        console.log("response: " + response.data.activities + response.data.location);
+        setActivitiesList(response.data.activities);
+        setPostalCode(response.data.location);
+  
+        const geocoder = new window.google.maps.Geocoder();
+        // alert("Geocoding: " + response.data.location);
+  
+        geocoder.geocode({ address: response.data.location }, (results, status) => {
+          if (status === "OK" && results && results.length > 0) {
+            const location = results[0].geometry.location;
+            setPostalCenter({
+              lat: location.lat(),
+              lng: location.lng(),
+            });
+            // Ensure resetMap() is called after setPostalCenter has been set
+            resetMap();
+          } else {
+            console.error("Geocoding failed:", status);
+          }
+        });
+      })
+      .catch(error => {
+        if (error.response && error.response.status === 401) {
+          navigate("/");
         } else {
-          console.error("Geocode was not successful for the following reason: " + status);
+          console.error("Error fetching dashboard data:", error);
         }
       });
-
-      resetMap();
-      //mapRef.current.setCenter(postalCode);
-    })
-    .catch(error => {
-        if (error.response && error.response.status === 401) {
-            navigate("/");
-        } else {
-            console.error("Error fetching dashboard data:", error);
-        }
-    });
   };
- 
+  
   const sendActivities = async () => {
     console.log("map key = " + "Bearer " + token)
 
@@ -215,12 +219,9 @@ export function MapFunctions() {
 
     if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
     {
-        alert(`Geocoding postal: ${postalCode}`);
         locationName = await getLocationName(postalCode);
-        alert(`Geocoded location: ${locationName}`);
     }
 
-    alert(`sending address: ${locationName}`);
     //axios.post(SendActivities_API_URL, {/*data to send here*/locationName, activityTime, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     //axios.post(SendActivities_API_URL, {/*data to send here*/postalCode, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
     axios.post(SendActivities_API_URL, {/*data to send here*/locationName, addactivity_time, selectedActivity} ,{headers:{ Authorization : "Bearer " + token}})
@@ -229,7 +230,6 @@ export function MapFunctions() {
     })
     .catch(error => {
         if (error.response && error.response.status === 401) {
-          alert("Logged out")  
           navigate("/");
         } else {
             console.error("Error fetching dashboard data:", error);
@@ -237,8 +237,6 @@ export function MapFunctions() {
     });
   };
   // End of communicating with backend
-
-  
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     const keyword = activity;
@@ -246,7 +244,7 @@ export function MapFunctions() {
     service.nearbySearch(
       {
         location: location,
-        radius: 10000, // Search within 10 km
+        radius: 20000, // Search within 10 km
         keyword: keyword, // Use the selected activity as a keyword
       },
       (results, status) => {
@@ -554,10 +552,14 @@ const fetchWeatherDataEnd = async () => {
 
   const resetMap = () => {
     if (mapRef.current) {
-      if(postalCode)
-          mapRef.current.setCenter(center);  // Reset to default center
+      if(postalCenter)
+      {
+        mapRef.current.setCenter(postalCenter);  // Reset to default center
+      }
       else
-          mapRef.current.setCenter(postalCenter);  // Reset to default center
+      {
+        mapRef.current.setCenter(center);  // Reset to default center
+      }
       
       mapRef.current.setZoom(14);        // Reset zoom level
   
@@ -586,9 +588,25 @@ const fetchWeatherDataEnd = async () => {
     localStorage.removeItem('formdatatime')
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchActivities()
-  },[])
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        // Optional cleanup logic if necessary (e.g., clear map markers, listeners, etc.)
+        mapRef.current = null; // Clear the reference to the map
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (postalCenter) {
+      resetMap();
+    }
+  }, [postalCenter]);
+
 
   return (
     <div>
