@@ -12,6 +12,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import mapstyle from "./css/Map.module.css";
 import Hikingicon from "../assets/Hiking icon.png"
 import Usericon from "../assets/User icon.png"
+import { parse } from "path";
 
 // Define interfaces for data structures
 interface WeatherData {
@@ -159,43 +160,41 @@ export function MapFunctions() {
   const addactivity_activity = localStorage.getItem('formdataactivity')
   const addactivity_location = localStorage.getItem('formdatalocation')
   const addactivity_time = localStorage.getItem('formdatatime')
+  const suggestedactivity = localStorage.getItem('suggestedactivity')
 
   //
   const [postalCenter, setPostalCenter] = useState<LatLng | null>(null);
 
   //Communicate with backend
-  const fetchActivities = async () => {
-    console.log("map key = " + "Bearer " + token);
-    axios.post(Activities_API_URL, { addactivity_activity, addactivity_location }, { headers: { Authorization: "Bearer " + token } })
-      .then(response => {
-        console.log("response: " + response.data.activities + response.data.location);
-        setActivitiesList(response.data.activities);
-        setPostalCode(response.data.location);
-  
-        const geocoder = new window.google.maps.Geocoder();
-        // alert("Geocoding: " + response.data.location);
-  
-        geocoder.geocode({ address: response.data.location }, (results, status) => {
-          if (status === "OK" && results && results.length > 0) {
-            const location = results[0].geometry.location;
-            setPostalCenter({
-              lat: location.lat(),
-              lng: location.lng(),
-            });
-            // Ensure resetMap() is called after setPostalCenter has been set
-            resetMap();
-          } else {
-            console.error("Geocoding failed:", status);
-          }
+  const fetchActivities = async () => {  
+    if(suggestedactivity){
+      const activitiesArray = suggestedactivity
+        .split(',')
+        .map(activity => activity.trim());
+
+      setActivitiesList(activitiesArray); // Set the activities list in state
+    }
+
+    if(addactivity_location){
+      setPostalCode(addactivity_location)
+    }
+    
+    const geocoder = new window.google.maps.Geocoder();
+    // alert("Geocoding: " + response.data.location);
+
+    geocoder.geocode({ address: postalCode }, (results, status) => {
+      if (status === "OK" && results && results.length > 0) {
+        const location = results[0].geometry.location;
+        setPostalCenter({
+          lat: location.lat(),
+          lng: location.lng(),
         });
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate("/");
-        } else {
-          console.error("Error fetching dashboard data:", error);
-        }
-      });
+        // Ensure resetMap() is called after setPostalCenter has been set
+        resetMap();
+      } else {
+        console.error("Geocoding failed:", status);
+      }
+    });
   };
   
   const sendActivities = async () => {
@@ -215,7 +214,8 @@ export function MapFunctions() {
       });
   };
    
-    let  locationName =  selectedActivityLocation?.name + " " + selectedActivityLocation?.vicinity;
+    //let  locationName =  selectedActivityLocation?.name + " " + selectedActivityLocation?.vicinity;
+    let  locationName =  selectedActivityLocation?.vicinity;
 
     if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
     {

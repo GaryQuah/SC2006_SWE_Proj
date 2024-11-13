@@ -1,13 +1,16 @@
-import signupstyle from "./css/Signup.module.css";
-import Hearticon from "../assets/Heart icon.png";
+import profilestyle from "./css/Profile.module.css";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import Hikingicon from "../assets/Hiking icon.png"
+import Usericon from "../assets/User icon.png"
+import BigUsericon from "../assets/Big User icon.png"
+import {NavLink, useNavigate} from "react-router-dom"
+import { AxiosError } from 'axios';
 
 export function Profile() {
     const [email, setEmail] = useState<string>("");
     const [userName, setUserName] = useState<string>("");
-    const [profilePicture, setProfilePicture] = useState<string>(Hearticon);
+    const [profilePicture, setProfilePicture] = useState<string>(BigUsericon);
     const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
@@ -29,11 +32,20 @@ export function Profile() {
                 const { email, name, profilePicture } = res.data;
                 setEmail(email);
                 setUserName(name);
-                setProfilePicture(profilePicture || Hearticon);
+                setProfilePicture(profilePicture || BigUsericon);
             }
-        } catch (err) {
-            console.error("Error fetching profile data:", err);
-            setError("Failed to load profile information.");
+        } catch (error: unknown) {
+            // Type assertion to Error
+            if (error instanceof AxiosError) {
+                if (error.response && error.response.status === 401) {
+                    navigate("/");  // Redirect to login page if unauthorized
+                } else {
+                    console.error("Error fetching dashboard data:", error.message);
+                }
+            } else {
+                // Handle case where error is not an instance of Error (shouldn't typically happen)
+                console.error("An unknown error occurred", error);
+            }
         }
     };
 
@@ -84,57 +96,85 @@ export function Profile() {
         } finally {
             setLoading(false);
         }
-    };        
+    };
+    
+    const Logout = () =>{
+        localStorage.removeItem('token');
+        localStorage.removeItem('formdataactivity');
+        localStorage.removeItem('formdatalocation');
+        localStorage.removeItem('formdatatime')
+    };
 
     const Back = () => {
         navigate("/dashboard");
     };
 
     return (
-        <main className={signupstyle.main_main}>
-            <button className={signupstyle.back_button} onClick={Back}>Back</button>
-            <div className={signupstyle.profile_container}>
-                <div className={signupstyle.profile_header}>
-                    <img src={profilePicture} alt="Profile" className={signupstyle.profile_img} />
-                    <h2>{userName}</h2>
-                    <p>{email}</p>
+        <>
+            <div className={profilestyle.header}>
+                    <NavLink to="/profile" className={profilestyle.profile}>
+                        <img src={Usericon}></img>
+                    </NavLink>
+                    <div className={profilestyle.menu_logo}>                        
+                        <div>
+                            <NavLink to="/dashboard" className={profilestyle.logo}>
+                                <img src={Hikingicon}></img>
+                                <h3>Outdoo</h3>
+                            </NavLink>
+                        </div>
+                    </div>
+                    <NavLink to="/" className={profilestyle.profile} onClick={Logout}>
+                        <h3 className={profilestyle.logout}>Logout</h3>
+                    </NavLink>
                 </div>
-                
-                <div className={signupstyle.change_password_section}>
-                    <h3>Change Password</h3>
-                    <hr />
-                    <form onSubmit={handlePasswordChange} className={signupstyle.password_form}>
-                        <label>Current Password:</label>
-                        <input
-                            type="password"
-                            placeholder="Enter current password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                        />
-                        <label>New Password:</label>
-                        <input
-                            type="password"
-                            placeholder="Enter new password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                        <label>Confirm New Password:</label>
-                        <input
-                            type="password"
-                            placeholder="Confirm new password"
-                            value={confirmNewPassword}
-                            onChange={(e) => setConfirmNewPassword(e.target.value)}
-                            required
-                        />
-                        <button type="submit" disabled={loading}>
-                            {loading ? "Updating..." : "Update"}
-                        </button>
-                        {error && <p className={signupstyle.error}>{error}</p>}
-                    </form>
+            <main className={profilestyle.main_main}>
+                <button className={profilestyle.backButton} onClick={Back}>Back</button>
+                <div className={profilestyle.profile_container}>
+                    <h2>Profile</h2>
+                    <div className={profilestyle.profile_header}>
+                        <img src={profilePicture} alt="Profile" className={profilestyle.profile_img} />
+                        <div>
+                            <h3>Name: {userName}</h3>
+                            <h3>Email: {email}</h3>
+                        </div>
+                    </div>
+                    
+                    <div className={profilestyle.change_password_section}>
+                        <h4>Change Password</h4>
+                        <hr />
+                        <form onSubmit={handlePasswordChange} className={profilestyle.password_form}>
+                            <label>Current Password:</label>
+                            <input
+                                type="password"
+                                placeholder="Enter current password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                required
+                            />
+                            <label>New Password:</label>
+                            <input
+                                type="password"
+                                placeholder="Enter new password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                required
+                            />
+                            <label>Confirm New Password:</label>
+                            <input
+                                type="password"
+                                placeholder="Confirm new password"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                required
+                            />
+                            <button type="submit" disabled={loading} className={profilestyle.submit}>
+                                {loading ? "Updating..." : "Update"}
+                            </button>
+                            {error && <p className={profilestyle.error}>{error}</p>}
+                        </form>
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </>
     );
 }

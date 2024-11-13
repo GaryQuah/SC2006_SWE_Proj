@@ -43,6 +43,8 @@ export function AddActivities(){
 
         axios.post(addactivity_API_URL, {formdataactivity, formdatalocation, formdatatime},  {headers:{ Authorization : "Bearer " + token}})
         .then(response => {
+            console.log(response.data.activities)
+            localStorage.setItem('suggestedactivity', response.data.activities);
             navigate("/map");
         })
         .catch(error => {
