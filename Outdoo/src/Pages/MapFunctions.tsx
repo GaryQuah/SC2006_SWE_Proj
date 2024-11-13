@@ -57,7 +57,7 @@ const containerStyle = {
 };
 
 const center = { lat: 1.3521, lng: 103.8198 }; // Default center position
-
+const [postalCenter, setPostalCenter] = useState<LatLng>(center);
 
 const ActivitiesList = [
   "Yoga",
@@ -159,6 +159,7 @@ export function MapFunctions() {
   const addactivity_location = localStorage.getItem('formdatalocation')
   const addactivity_time = localStorage.getItem('formdatatime')
 
+  //Communicate with backend
   const fetchActivities = async () => {
     console.log("map key = " + "Bearer " + token)
     axios.post(Activities_API_URL, {addactivity_activity,addactivity_location},{headers:{ Authorization : "Bearer " + token}})
@@ -166,6 +167,22 @@ export function MapFunctions() {
       console.log("response: "+ response.data.activities + response.data.location)
       //setActivitiesList(response.data.activities)
       setPostalCode(response.data.location)
+
+      const geocoder = new window.google.maps.Geocoder();
+    
+      geocoder.geocode({ address: postalCode }, (results, status) => {
+      if (status === "OK" && results && results.length > 0) {
+          const location = results[0].geometry.location;
+          setPostalCenter({
+            lat: location.lat(),
+            lng: location.lng(),
+          });
+        } else {
+          console.error("Geocode was not successful for the following reason: " + status);
+        }
+      });
+
+      resetMap();
       //mapRef.current.setCenter(postalCode);
     })
     .catch(error => {
@@ -219,7 +236,9 @@ export function MapFunctions() {
         }
     });
   };
+  // End of communicating with backend
 
+  
   const fetchActivityLocations = (activity: string, location: LatLng) => {
     const service = new window.google.maps.places.PlacesService(mapRef.current!);
     const keyword = activity;
@@ -535,7 +554,11 @@ const fetchWeatherDataEnd = async () => {
 
   const resetMap = () => {
     if (mapRef.current) {
-      mapRef.current.setCenter(center);  // Reset to default center
+      if(postalCode)
+          mapRef.current.setCenter(center);  // Reset to default center
+      else
+          mapRef.current.setCenter(postalCenter);  // Reset to default center
+      
       mapRef.current.setZoom(14);        // Reset zoom level
   
       setDirections(null);               // Clear directions
