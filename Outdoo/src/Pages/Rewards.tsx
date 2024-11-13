@@ -152,7 +152,7 @@ export function Rewards() {
 
             {isPopupVisible && (
                 <div className={rewardsStyle.popup}>
-                    <p>You have successfully claimed the {rewardInfo.name}!</p>
+                    <p>You have successfully claimed the {rewardInfo.name}! The redemption QR codes will be sent to your email within 3 working days.</p>
                     <p>Remaining balance: {rewardInfo.pointsRemaining} points</p>
                     <button onClick={closePopup}>Close</button>
                 </div>
@@ -160,7 +160,7 @@ export function Rewards() {
 
             {isClaimAllPopupVisible && (
                 <div className={rewardsStyle.popup}>
-                    <p>You have successfully claimed all available rewards!</p>
+                    <p>You have successfully claimed all available rewards! The redemption QR codes will be sent to your email within 3 working days.</p>
                     <p>Remaining balance: {points} points</p>
                     <button onClick={closePopup}>Close</button>
                 </div>
