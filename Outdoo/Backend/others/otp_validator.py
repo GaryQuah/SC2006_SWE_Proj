@@ -7,7 +7,7 @@ def otp_validation(to_mail):
     for i in range(6):
         otp += str(random.randint(0,9))
 
-    print(otp)
+    print("OTP = " + otp)
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()

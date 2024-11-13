@@ -30,6 +30,12 @@ class Points(db.Model):
     point = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+class Rewards(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    RewardName = db.Column(db.String(50))
+    status = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
@@ -38,3 +44,4 @@ class User(db.Model, UserMixin):
     notes = db.relationship('Note')
     activity = db.relationship('Activity')
     points = db.relationship('Points')
+    rewards = db.relationship('Rewards')

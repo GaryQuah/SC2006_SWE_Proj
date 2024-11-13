@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from .models import User, Note, Activity, Location, Time, Points
+from .models import User, Note, Activity, Location, Time, Points, Rewards
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import logout_user
@@ -12,6 +12,9 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from datetime import datetime
+from flask_jwt_extended import get_jwt
+from .otp_validator import otp_validation
+from datetime import timedelta
 
 views = Blueprint('views', __name__)
 auth = Blueprint('auth', __name__)
@@ -32,9 +35,13 @@ def login():
             user = User.query.filter_by(email=email).first()
             if user:
                 if check_password_hash(user.password, password):
-                    access_token = create_access_token(identity=email)
-                    print("access token: ", access_token)
-                    return jsonify({"email": email, "token": access_token}), 200
+                    otp = otp_validation(email)
+                    print("OTP IS "+ otp)
+                    otp_token = create_access_token(
+                        identity=email, 
+                        additional_claims={"otp": otp}, 
+                        expires_delta=timedelta(minutes=5))
+                    return jsonify({"message": "OTP sent to email", "otp_token": otp_token}), 200
                 else:
                     return jsonify({'message': "Wrong Credentials"}), 401
             else:
@@ -42,8 +49,29 @@ def login():
         except Exception as e:
             print("Error occurred:", e)  # Log the error for debugging
             return jsonify({"error": "An unexpected error occurred."}), 500
-        
+
     return jsonify({"message": "Method not allowed. Use POST to log in."}), 405
+
+@auth.route('/verify-otp', methods=['POST'])
+@jwt_required()
+def verify_otp():
+    data = request.get_json()
+    entered_otp = data.get('otp')
+    claims = get_jwt()
+    saved_otp = claims.get("otp")
+    email = claims["sub"]
+    if saved_otp is None:
+        print("No OTP found in session. It may have expired or was not set correctly.")
+        return jsonify({"error": "Session expired. Please log in again."}), 401
+
+    print("saved_otp =", saved_otp)
+    print("entered_otp =", entered_otp)
+
+    if entered_otp == saved_otp and email:
+        access_token = create_access_token(identity=email, expires_delta=timedelta(minutes=60))
+        return jsonify({"message": "OTP verified", "token": access_token}), 200
+    else:
+        return jsonify({"error": "Invalid OTP or session expired"}), 401
 
 @auth.route('/logout', methods=['GET','POST'])
 @jwt_required
@@ -90,6 +118,7 @@ def sign_up():
                 new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha256'))
                 db.session.add(new_user)
                 db.session.commit()
+                initialize_rewards(new_user)
                 return jsonify({'message': "Account created!"}), 200
 
         except Exception as e:
@@ -97,60 +126,6 @@ def sign_up():
             return jsonify({"error": str(e)}), 500
             
     return jsonify({"message":"nothing"})
-
-@views.route('/dashboard', methods=['GET'])
-@jwt_required()
-def dashboard():
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(email=current_user).first()
-    user_id = user.id 
-    user_activities = Activity.query.filter_by(user_id=user_id).all()
-    user_points = Points.query.filter_by(user_id=user_id).first()
-    
-    activities_list = []
-    for activity in user_activities:
-        activity_data = {
-            "activityID": activity.id,
-            "activityName": activity.activityName,
-            "activityTime": num_to_time(activity.time.start_time) if activity.time else None,
-            "activityLocation": activity.location.location if activity.location else None
-        }
-        activities_list.append(activity_data)
-    points = user_points.point if user_points else 0
-
-    print(points)
-    
-    # Fetch weather and UV details
-    _, description, temperature = get_weather()
-    uv_index = get_uv_index()
-    
-    # Generate UV description based on uv_index
-    if uv_index <= 2:
-        uv_description = "Low: You’re good to go! Enjoy the outdoors, but pop on a little SPF 15+."
-    elif uv_index in {3, 4, 5}:
-        uv_description = "Moderate: It’s a warm day! Wear a hat, sunglasses, and don’t forget your SPF 30+."
-    elif uv_index in {6, 7}:
-        uv_description = "High: Sun’s getting strong! Grab your sunscreen (SPF 30+)"
-    elif uv_index in {8, 9, 10}:
-        uv_description = "Very High: The sun means business! You’ll need full protection: SPF 30+, a hat, and long sleeves."
-    elif uv_index >= 11:
-        uv_description = "Extreme: Whoa, it's intense out there! Cover up with SPF 30+, wear a hat, long sleeves, and try to stay indoors."
-
-    # Structure data for JSON response
-    data = {
-        "weather_description": description,
-        "weather_icon" : _,
-        "temperature": temperature,
-        "uv_index": uv_index,
-        "uv_description": uv_description,
-        "activities": activities_list,
-        "points": points
-    }
-    
-    print(data)
-    # Send the data as JSON response
-    
-    return jsonify(data)
 
 @views.route('/profile', methods=['GET'])
 @jwt_required()
@@ -196,6 +171,59 @@ def change_password():
     print("Password changed successfully")
     return jsonify({"message": "Password changed successfully"}), 200
 
+@views.route('/dashboard', methods=['GET'])
+@jwt_required()
+def dashboard():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    user_id = user.id 
+    user_activities = Activity.query.filter_by(user_id=user_id).all()
+    user_points = Points.query.filter_by(user_id=user_id).first()
+    
+    activities_list = []
+    for activity in user_activities:
+        activity_data = {
+            "activityID": activity.id,
+            "activityName": activity.activityName,
+            "activityTime": activity.time.start_time if activity.time else None,
+            "activityLocation": activity.location.location if activity.location else None
+        }
+        activities_list.append(activity_data)
+    points = user_points.point if user_points else 0
+
+    print(points)
+    
+    # Fetch weather and UV details
+    _, description, temperature = get_weather()
+    uv_index = get_uv_index()
+    
+    # Generate UV description based on uv_index
+    if uv_index <= 2:
+        uv_description = "Low: You’re good to go! Enjoy the outdoors, but pop on a little SPF 15+."
+    elif uv_index in {3, 4, 5}:
+        uv_description = "Moderate: It’s a warm day! Wear a hat, sunglasses, and don’t forget your SPF 30+."
+    elif uv_index in {6, 7}:
+        uv_description = "High: Sun’s getting strong! Grab your sunscreen (SPF 30+)"
+    elif uv_index in {8, 9, 10}:
+        uv_description = "Very High: The sun means business! You’ll need full protection: SPF 30+, a hat, and long sleeves."
+    elif uv_index >= 11:
+        uv_description = "Extreme: Whoa, it's intense out there! Cover up with SPF 30+, wear a hat, long sleeves, and try to stay indoors."
+
+    # Structure data for JSON response
+    data = {
+        "weather_description": description,
+        "weather_icon" : _,
+        "temperature": temperature,
+        "uv_index": uv_index,
+        "uv_description": uv_description,
+        "activities": activities_list,
+        "points": points
+    }
+    
+    print(data)
+    # Send the data as JSON response
+    
+    return jsonify(data)
 
 @views.route('/updatepoints', methods=['GET', 'POST'])
 @jwt_required()
@@ -220,6 +248,46 @@ def updatepoints():
         
     return jsonify({"points": inipoints})
 
+@views.route('/rewards', methods=['GET', 'POST'])
+@jwt_required()
+def rewards():
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    user_id = user.id 
+    user_reward = Rewards.query.filter_by(user_id=user_id).all()
+    inireward = []
+    for reward in user_reward:
+        reward_data = {
+            "rewardID": reward.id,
+            "rewardName": reward.RewardName,
+            "rewardStatus": reward.status
+        }
+        inireward.append(reward_data)
+    user_points = Points.query.filter_by(user_id=user_id).first()
+    inipoints = user_points.point if user_points else 0
+    
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        print("reward data = ",data)
+        points = data.get('updatedPoints')
+        rewards = data.get('updatedRewards')
+        print(points)
+        print(rewards)
+
+        i = 0
+        for reward in rewards:
+            user_reward[i].status = reward['claimed']
+            i+=1
+        
+        user_points.point = points
+
+        db.session.commit()
+
+        return jsonify({"reward": rewards, "points": points}),200
+        
+    return jsonify({"reward": inireward, "points": inipoints})
+
 @views.route('/addactivity', methods=['GET', 'POST'])
 @jwt_required()
 def addactivity():
@@ -231,17 +299,17 @@ def addactivity():
     if request.method == 'POST':
         data = request.get_json()
         print(data)
-        activity = data.get('addactivity_activity')
-        location = data.get('addactivity_location')
+        activity = data.get('formdataactivity')
+        location = data.get('formdatalocation')
         print("activity after get:", activity)
         print("location after get:", location)
         ActivitiesList.append(activity)
-        prompt =  f"From the list={ActivitiesList}, can you return me a list of activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Activities = []"
-        #chatbot_response = get_response(prompt)
-        #print(chatbot_response)
-        chatbot_response = ("Activities = ['Indoor Cycling', 'Jump Rope', 'Aerobics', 'Basketball', 'Badminton', 'Table Tennis', 'Dance', 'Gym', 'Pilates']")
+        prompt = f"From the list={ActivitiesList}, can you return me a list of activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Activities = []"
+        chatbot_response = get_response(prompt)
+        print("chatbot response = ",chatbot_response)
+        #chatbot_response = ("Activities = ['Indoor Cycling', 'Jump Rope', 'Aerobics', 'Basketball', 'Badminton', 'Table Tennis', 'Dance', 'Gym', 'Pilates']")
         Activities = ast.literal_eval(chatbot_response.split('=')[1].strip())
-        print(Activities)
+        print("Activities = ",Activities)
         print(location)
 
         return jsonify({"activities" : Activities, "location" : location})
@@ -257,7 +325,7 @@ def sendactivity():
         activity = data.get('selectedActivity')
         activitytime = data.get('addactivity_time')
         activitytime = num_to_time(activitytime)
-        activitylocation = data.get('postalCode')
+        activitylocation = data.get('locationName')
         print("activity data=", activity, activitytime, activitylocation)
         current_user = get_jwt_identity()
         user = User.query.filter_by(email=current_user).first()
@@ -307,3 +375,14 @@ def num_to_time(num):
     minutes = (num % 2) * 30
     time = datetime.strptime(f"{hours:02}:{minutes:02}", "%H:%M")
     return time.strftime("%I:%M %p")
+
+def initialize_rewards(user):
+    default_rewards = [
+        {"RewardName": "Watson", "status": False},
+        {"RewardName": "Acai", "status": False},
+        {"RewardName": "Matcha", "status": False}
+    ]
+    for reward in default_rewards:
+        new_reward = Rewards(RewardName=reward["RewardName"], status=reward["status"], user_id=user.id)
+        db.session.add(new_reward)
+    db.session.commit()
