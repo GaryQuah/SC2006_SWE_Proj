@@ -16,13 +16,9 @@ export function Login(){
         console.log(email, password);
         axios.post(login_API_URL, { email, password })
     .then(response => {
-        console.log("Login successful", response.data);
-        const token = response.data.token;
-        localStorage.setItem('token', token);
-        localStorage.setItem('justLoggedIn', 'true');  // Set flag for first login
-        console.log(localStorage.getItem('justLoggedIn'))
-        console.log(token)
-        navigate("/dashboard");
+        const otpToken = response.data.otp_token;
+        localStorage.setItem('otp_token', otpToken);
+        navigate("/verify-otp");
     })
     .catch(err => {
         if(err.status === 401){
