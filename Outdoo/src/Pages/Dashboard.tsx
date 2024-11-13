@@ -11,9 +11,9 @@ import { useEffect, useState } from "react"
 import { Healthbuddy } from "../Components/Healthbuddy"
 
 export function Dashboard(){
-    const DATA_API_URL = 'http://127.0.0.1:5000/dashboard'
-    const DELETEACTIVITY_API_URL = 'http://127.0.0.1:5000/delete-activity'
-    const UPDATEPOINTS_API_URL = 'http://127.0.0.1:5000/updatepoints'
+    const DATA_API_URL = 'http://127.0.0.1:5000/dashboard';
+    const DELETEACTIVITY_API_URL = 'http://127.0.0.1:5000/delete-activity';
+    const UPDATEPOINTS_API_URL = 'http://127.0.0.1:5000/updatepoints';
     const [UVData, setUVData] = useState('Loading...');
     const [WeatherData, setWeatherData] = useState('Loading...');
     const [Weather_Des, setWeatherDes] = useState([]);
@@ -91,7 +91,6 @@ export function Dashboard(){
             headers: { Authorization: "Bearer " + token }
         })
         .then(response => {
-            setUserPoints(response.data.updatedPoints); // Update local points state
         })
         .catch(error => {
             console.error("Error updating points:", error);

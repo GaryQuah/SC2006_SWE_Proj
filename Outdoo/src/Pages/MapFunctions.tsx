@@ -146,8 +146,8 @@ export function MapFunctions() {
   const [_endpointUVData, setEndUVData] = useState<UvData | null>(null);
 
   //API Keys - Change when / where needed
-  //const WEATHER_API_KEY = "704bf997547d0f7ed616723a4499158b"; 
-  //const GMAPS_API_KEY = "AIzaSyCrMk9TYDJfYmWjsTK_OVra9uTRdiEqp_c"; 
+  const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY; 
+  const GMAPS_API_KEY = import.meta.env.VITE_GMAP_APIKEY; 
 
   //Fetch activity data from get activity page
   //const [ActivitiesList, setActivitiesList] = useState<string[]>([]); // Specify type as string[]

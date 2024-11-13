@@ -42,6 +42,7 @@ body{
 h2{
     margin: 0;
 }
+/*Header section*/
 
 .header{
     display: flex;
@@ -60,7 +61,7 @@ h2{
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    margin-left: 3.8em;
+    margin-left: 3.3em;
 }
 
 .menu_button{
@@ -112,7 +113,31 @@ h2{
 
 .main_main{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+}
+
+.back{
+    margin-top: 0.5em;
+    height: 3em;
+    width: 5em;
+    margin-left: 0.3em;
+    border-radius: 0.5em;
+    font-size: 1em;
+    transition: 0.3s ease;
+    background-color: rgb(212, 67, 67);
+    font-weight: bold;
+}
+
+.back:hover{
+    cursor: pointer;
+    transform: scale(1.1);    
+}
+
+.formdiv{
+    margin: auto;
+    position: relative;
+    left: -2.8em;
+
 }
 
 .heading{
