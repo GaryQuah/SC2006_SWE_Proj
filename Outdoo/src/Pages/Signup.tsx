@@ -68,7 +68,7 @@ export function Signup(){
                         <label htmlFor="email">Email:</label>
                         <input type="email" placeholder=" Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>  
                         <label htmlFor="email">Name:</label>
-                        <input type="text" placeholder=" Bob" value={userName} onChange={(e) => setUserName(e.target.value)} required/>   
+                        <input type="text" placeholder=" Name" value={userName} onChange={(e) => setUserName(e.target.value)} required/>   
                         <label htmlFor="password">Password:</label>
                         <input type="password" placeholder=" ********" value={password} onChange={(e) => setPassword(e.target.value)} required/>
                         <label htmlFor="confirmpassword">Confirm Password:</label>

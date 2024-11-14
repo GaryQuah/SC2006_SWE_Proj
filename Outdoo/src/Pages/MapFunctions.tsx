@@ -588,6 +588,10 @@ const fetchWeatherDataEnd = async () => {
     localStorage.removeItem('formdatatime')
   };
 
+  const Back=() =>{
+    navigate("/dashboard");
+  };
+
   useEffect(() => {
     fetchActivities()
   }, []);
@@ -629,6 +633,7 @@ const fetchWeatherDataEnd = async () => {
       <LoadScript googleMapsApiKey={GMAPS_API_KEY} libraries={["places"]}>
 
           <div className={mapstyle.labelContainer}>
+          <button className={mapstyle.buttonback} onClick={Back}>Back</button>
           <label >Postal Code:</label>
           <input className={mapstyle.searchInput1}
               type="text"

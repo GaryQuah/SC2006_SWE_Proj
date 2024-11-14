@@ -197,7 +197,6 @@ export function Rewards() {
                     <div className={rewardsStyle.title}>Rewards</div>
                     <div className={rewardsStyle.pointsContainer}>
                         <div className={rewardsStyle.currentPoints}>Current Points: {points}</div>
-                        <button className={rewardsStyle.refreshButton} onClick={getPoints}>Refresh Points</button>
                     </div>
                 </header>
 
