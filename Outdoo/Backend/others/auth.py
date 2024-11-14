@@ -45,7 +45,7 @@ def login():
                 else:
                     return jsonify({'message': "Wrong Credentials"}), 401
             else:
-                return jsonify({'message': "Email does not exist"}), 401
+                return jsonify({'message': "Wrong Credentials"}), 401
         except Exception as e:
             print("Error occurred:", e)  # Log the error for debugging
             return jsonify({"error": "An unexpected error occurred."}), 500
@@ -303,7 +303,9 @@ def addactivity():
         location = data.get('formdatalocation')
         print("activity after get:", activity)
         print("location after get:", location)
-        ActivitiesList.append(activity)
+        if(activity not in ActivitiesList):
+            ActivitiesList.append(activity)
+
         prompt = f"From the list={ActivitiesList}, can you return me a list of activities that are suitable for me to do with the current UV Index: {uv_index}, Weather Description: {description}, Temperature: {temperature}°C. No unnecessary words, just in this format: Activities = []"
         chatbot_response = get_response(prompt)
         print("chatbot response = ",chatbot_response)
