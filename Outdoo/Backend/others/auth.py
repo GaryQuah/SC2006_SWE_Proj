@@ -43,9 +43,9 @@ def login():
                         expires_delta=timedelta(minutes=5))
                     return jsonify({"message": "OTP sent to email", "otp_token": otp_token}), 200
                 else:
-                    return jsonify({'message': "Wrong Credentials"}), 401
+                    return jsonify({'message': "Wrong Password"}), 401
             else:
-                return jsonify({'message': "Wrong Credentials"}), 401
+                return jsonify({'message': "Email not registered"}), 401
         except Exception as e:
             print("Error occurred:", e)  # Log the error for debugging
             return jsonify({"error": "An unexpected error occurred."}), 500
