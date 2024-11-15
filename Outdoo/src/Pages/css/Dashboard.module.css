@@ -270,7 +270,7 @@ img{
     font-size: var(--activity-size);
 }
 .activities p{
-    justify-self: left;
+    text-align: left;
 }
 
 .activities button{

@@ -215,7 +215,9 @@ export function MapFunctions() {
   };
    
     //let  locationName =  selectedActivityLocation?.name + " " + selectedActivityLocation?.vicinity;
-    let  locationName =  selectedActivityLocation?.vicinity;
+    //let  locationName =  selectedActivityLocation?.vicinity;
+    let  locationName =  selectedActivityLocation?.name.trim()
+    console.log("lcoationname = "+locationName)
 
     if (selectedActivity  == "Running" || selectedActivity  == "Cycling" || selectedActivity  == "Walking") 
     {

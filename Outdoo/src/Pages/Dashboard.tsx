@@ -33,7 +33,7 @@ export function Dashboard(){
                     headers: { Authorization: "Bearer " + token }
                 });
                 console.log(pointsres.data.points)
-                const updatedPoints = 200 + parseInt(pointsres.data.points, 10);  // Calculate updated points
+                const updatedPoints = 400 + parseInt(pointsres.data.points, 10);  // Calculate updated points
                 console.log("updated points= "+updatedPoints)
                 updatePoints(updatedPoints);  // Wait for the points to be updated
                 setShowLoginNotification(true);  // Show notification after points are updated
@@ -110,7 +110,7 @@ export function Dashboard(){
                 <div className={dashboardstyle.notificationOverlay}>
                     <div>
                         <h3>🎉 Congrats on Logging In!</h3>
-                        <p>You've gained 200 points. Keep it up!</p>
+                        <p>You've gained 400 points. Keep it up!</p>
                     </div>
                     <button className={dashboardstyle.closeNotification} onClick={closeNotification}>&times;</button>
                 </div>
