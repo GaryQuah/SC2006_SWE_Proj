@@ -3,7 +3,7 @@
 The purpose of the project is to develop an intelligent web app that delivers personalised activity recommendations by leveraging real-time environmental data. This application is specifically designed for residents of Singapore which provides them with tailored suggestions for outdoor activities based on current weather conditions as well as UV index levels. The system will ensure that users are offered safe and enjoyable activity options that align with their health-conscious goals and environmental awareness.
 
 ## Video Demo
-[![Watch the video](https://img.youtube.com/vi/8CqTpc_Evo8/maxresdefault.jpg)](https://youtu.be/8CqTpc_Evo8)
+[![Watch the video](https://img.youtube.com/vi/HtUVUb2tRc0/maxresdefault.jpg)](https://youtu.be/HtUVUb2tRc0)
 ## Authors
 
 - [@GaryQuah](https://www.github.com/GaryQuah)
@@ -28,8 +28,7 @@ The purpose of the project is to develop an intelligent web app that delivers pe
 
 
 
-## Screenshots
-Instruction:
+## Instruction:
 ![instruction](https://github.com/GaryQuah/SC2006_SWE_Proj/blob/JamesTzh-integrated-backend-v1/instructions.png)
 
 to run react side: navigate to outdoo folder and type "npm run dev"
